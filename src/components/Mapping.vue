@@ -19,7 +19,6 @@
 <script>
 
   import * as d3 from 'd3'
-  import {store, bulbs} from '../store/bulbs'
 
   const app = {
 
@@ -27,100 +26,100 @@
 
     data: function () {
       return {
-        bulbs: bulbs
+        bulbs: this.$store.state.bulbs
       }
     },
 
     mounted: function () {
-
-      var svg = d3.select("svg"),
-        diameter = +svg.attr("width"),
-        g = svg.append("g").attr("transform", "translate(2,2)"),
-        format = d3.format(",d")
-
-      var pack = d3.pack()
-        .size([diameter - 700, diameter - 700])
-
-
-      var rootElement = d3.hierarchy(this.bulbs).sum(function (d) {
-        return d.id + 10;
-      })
-
-      var node = g.selectAll(".node")
-        .data(pack(rootElement).descendants())
-        .enter()
-        .append("g")
-        .attr("class", function (d) {
-          return d.children ? "node" : "leaf node";
-        })
-        .attr("transform", function (d) {
-          return "translate(" + d.x + "," + d.y + ")";
-        });
-
-      node.append("title")
-        .text(function (d) {
-          return d.data.title + "\n" + format(d.id);
-        });
-
-      node.append("circle")
-        .attr("r", function (d) {
-          return d.r;
-        })
-
-      node.filter(function (d) {
-        return !d.children;
-      }).append("text")
-        .attr("dy", "0.3em")
-        .text(function (d) {
-          return d.data.title.substring(0, d.r / 3);
-        });
-
-      var g = node.filter(function (d) {
-        return d.depth <= 2 && (!d.children || d.children.length < 4)
-      }).append("g");
-
-      g.append("title")
-        .append("text")
-        .text(function (d) {
-          return "Add new element to " + d.data.title
-        })
-
-      g.append("circle")
-        .attr("fill", "url(#add)")
-        .attr("cy", function (d) {
-          return d.r - 10
-        })
-        .attr("r", function (d) {
-          return 10
-        })
-        .on("click", function () {
-          alert("adding new item")
-        })
-
+      this.drawMap()
     },
 
     // watch bulbs change for localStorage persistence
     watch: {
 
-        bulbs : {
-          handler: function () {
-
-            console.log("asd")
-
-            var rootElement = d3.hierarchy(this.bulbs).sum(function (d) {
-              return d.id + 10;
-            })
-
-            g.selectAll(".node")
-              .data(pack(rootElement).descendants())
-          }
-        }
+      bulbs: {
+        handler: function () {
+          this.drawMap()
+        },
+        deep: true
+      }
 
     },
 
     // methods that implement data logic.
     // note there's no DOM manipulation here at all.
-    methods: {},
+    methods: {
+
+      drawMap: function () {
+
+        // I guess this can be done more performant
+        d3.select("svg").selectAll("g").remove()
+
+        var svg = d3.select("svg"),
+          diameter = +svg.attr("width"),
+          g = svg.append("g").attr("transform", "translate(2,2)"),
+          format = d3.format(",d")
+
+        var pack = d3.pack()
+          .size([diameter - 414, diameter - 414])
+
+        var rootElement = d3.hierarchy(this.bulbs).sum(function (d) {
+          return (d.id || 0) + 10;
+        })
+
+        var node = g.selectAll(".node")
+          .data(pack(rootElement).descendants())
+          .enter()
+          .append("g")
+          .attr("class", function (d) {
+            return d.children ? "node" : "leaf node";
+          })
+          .attr("transform", function (d) {
+            return "translate(" + d.x + "," + d.y + ")";
+          });
+
+        node.append("title")
+          .text(function (d) {
+            return d.data.title + "\n" + format(d.data.id || 0);
+          });
+
+        node.append("circle")
+          .attr("r", function (d) {
+            return d.r;
+          })
+
+        node.filter(function (d) {
+          return !d.children;
+        }).append("text")
+          .attr("dy", "0.3em")
+          .text(function (d) {
+            return d.data.title.substring(0, d.r / 3);
+          });
+
+        var gInner = node.filter(function (d) {
+          return d.depth <= 2 && (!d.children || d.children.length < 4)
+        }).append("g");
+
+        gInner.append("title")
+          .append("text")
+          .text(function (d) {
+            return "Add new element to " + d.data.title
+          })
+
+        gInner.append("circle")
+          .attr("fill", "url(#add)")
+          .attr("cy", function (d) {
+            return d.r - 10
+          })
+          .attr("r", function (d) {
+            return 10
+          })
+          .on("click", function () {
+            alert("adding new item")
+          })
+      }
+
+    },
 
   }
 

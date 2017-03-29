@@ -4,6 +4,7 @@
     <section class="header">
 
       <h1>Bulbs</h1>
+
       <input class="new-bulb"
              autocomplete="off"
              placeholder="What did you discover"
@@ -18,6 +19,7 @@
           <video ref="video" style="width:50px;height:50px"/>
         </section>
       </transition>
+
     </section>
 
     <mapping></mapping>
@@ -29,7 +31,7 @@
 <script>
 
   import Mapping from './Mapping'
-  import {store, bulbs} from '../store/bulbs'
+  import {store} from '../store/bulbs'
 
   const app = {
     name: 'brain',
@@ -40,7 +42,7 @@
 
     data: function () {
       return {
-        bulbs: bulbs.children.slice(0),
+        bulbs: this.$store.state.bulbs,
         showMedia: false,
         media: {
           src: null,
@@ -61,12 +63,6 @@
 
     // watch bulbs change for localStorage persistence
     watch: {
-      bulbs: {
-        handler: function (bulbs) {
-          store.save()
-        },
-        deep: true
-      },
       showMedia: {
         handler: function (show) {
           if (show) {
@@ -95,26 +91,9 @@
     // note there's no DOM manipulation here at all.
     methods: {
 
-      getCanvas () {
-        if (!this.media.hasUserMedia) return null
-
-        if (!this.ctx) {
-          const canvas = document.createElement('canvas')
-          canvas.height = this.$refs.video.clientHeight
-          canvas.width = this.$refs.video.clientWidth
-          this.canvas = canvas
-          this.ctx = canvas.getContext('2d')
-        }
-
-        const {ctx, canvas} = this
-        ctx.drawImage(this.$refs.video, 0, 0, canvas.width, canvas.height)
-
-        return canvas
-      },
-
       search: function () {
         const self = this
-        var result = this.bulbs.filter(function(bulb){
+        this.$store.state.bulbs.children.filter(function (bulb) {
           return self.newBulb.length == 0 || bulb.title.indexOf(self.newBulb) >= 0
         })
       },
@@ -122,13 +101,13 @@
       addBulb: function () {
         var value = this.newBulb && this.newBulb.trim()
 
-        if (!value) {
+        if (value.length == 0) {
           return
         }
 
-        this.bulbs.push(store.add({
-          title: value,
-        }))
+        this.$store.commit("add", {
+          title: value
+        })
 
         this.newBulb = ''
       }
@@ -249,7 +228,7 @@
 
   .media {
     position: relative;
-    float:right;
+    float: right;
     margin: 0px;
   }
 

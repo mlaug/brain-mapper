@@ -7,6 +7,8 @@ describe('Mapping.vue', () => {
     const Constructor = Vue.extend(Mapping)
     const vm = new Constructor().$mount()
     expect(vm.$el.querySelector('.mapping-canvas')).to.exist
+    expect(vm.$el.querySelector('.node')).to.exist
+    expect(vm.$el.querySelector('.node')).to.have.lengthOf(1)
   })
 
 })

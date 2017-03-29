@@ -1,5 +1,8 @@
 import Vue from 'vue'
+import Vuex from 'vuex'
+
 Vue.config.productionTip = false
+Vue.use(Vuex)
 
 // Polyfill fn.bind() for PhantomJS
 /* eslint-disable no-extend-native */
