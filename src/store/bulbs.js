@@ -19,16 +19,29 @@ export const store = new Vuex.Store({
     bulbs: {
       title: "Bulbs",
       children: []
-    }
+    },
+
+    selectedBulb: 0
 
   },
 
   mutations: {
+    
     add (state, bulb) {
+      const bulbToAddTo = state.bulbs.children.filter(function(bulb) {
+        return state.selectedBulb == bulb.id
+      }).pop() || state.bulbs
       bulb.id = uid++
       bulb.children = []
-      state.bulbs.children.push(bulb)
+      bulbToAddTo.children.push(bulb)
+    },
+
+    select (state, bulbId) {
+      state.selectedBulb = state.bulbs.children.filter(function(bulb) {
+        return bulb.id == bulbId
+      }).length == 1 ? bulbId : 0
     }
+
   }
 
 })

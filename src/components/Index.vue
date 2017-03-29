@@ -31,9 +31,9 @@
 <script>
 
   import Mapping from './Mapping'
-  import {store} from '../store/bulbs'
 
   const app = {
+
     name: 'brain',
 
     components: {
@@ -51,14 +51,6 @@
         },
         newBulb: ''
       }
-    },
-
-    mounted: function () {
-
-    },
-
-    updated: function () {
-
     },
 
     // watch bulbs change for localStorage persistence
@@ -84,8 +76,6 @@
         }
       }
     },
-
-    filters: {},
 
     // methods that implement data logic.
     // note there's no DOM manipulation here at all.

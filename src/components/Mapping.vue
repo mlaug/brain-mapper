@@ -52,6 +52,8 @@
 
       drawMap: function () {
 
+        const self = this
+
         // I guess this can be done more performant
         d3.select("svg").selectAll("g").remove()
 
@@ -86,6 +88,9 @@
         node.append("circle")
           .attr("r", function (d) {
             return d.r;
+          })
+          .on("click", function (d) {
+            self.$store.commit("select", d.data.id)
           })
 
         node.filter(function (d) {
