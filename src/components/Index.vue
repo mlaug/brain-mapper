@@ -43,12 +43,14 @@
     data: function () {
       return {
         bulbs: this.$store.state.bulbs,
+
         showMedia: false,
         media: {
           src: null,
           stream: null,
           hasUserMedia: false
         },
+
         newBulb: ''
       }
     },
@@ -77,8 +79,6 @@
       }
     },
 
-    // methods that implement data logic.
-    // note there's no DOM manipulation here at all.
     methods: {
 
       search: function () {
@@ -95,7 +95,7 @@
           return
         }
 
-        this.$store.commit("add", {
+        this.$store.commit("addBulb", {
           title: value
         })
 

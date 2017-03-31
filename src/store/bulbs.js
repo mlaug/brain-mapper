@@ -1,20 +1,24 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import {Eventstore} from './plugins/eventstore'
 
 Vue.use(Vuex)
 
-export const STORAGE_KEY = 'bulbs'
+var uid = 1
+var tuid = 1
 
-// for testing
-if (navigator.userAgent.indexOf('PhantomJS') > -1) {
-  window.localStorage.clear()
+const protoBulbs = {
+  title: "Bulbs",
+  children: []
 }
-
-var uid = 1;
 
 export const store = new Vuex.Store({
 
+  plugins: [Eventstore],
+
   state: {
+
+    topics: [],
 
     bulbs: {
       title: "Bulbs",
@@ -26,18 +30,29 @@ export const store = new Vuex.Store({
   },
 
   mutations: {
-    
-    add (state, bulb) {
-      const bulbToAddTo = state.bulbs.children.filter(function(bulb) {
-        return state.selectedBulb == bulb.id
-      }).pop() || state.bulbs
+
+    addBulb (state, bulb, topicId) {
+      const topicToAddTo = state.topics.find(function (topic) {
+        return topic.id == topicId
+      })
+
+      const bulbToAddTo = state.bulbs.children.find(function (bulb) {
+          return state.selectedBulb == bulb.id
+        }) || state.bulbs
+
       bulb.id = uid++
       bulb.children = []
       bulbToAddTo.children.push(bulb)
     },
 
+    addTopic(state, topic) {
+      topic.id = tuid++
+      topic.bulbs = Object.assign({}, protoBulbs)
+      state.topics.push(topic)
+    },
+
     select (state, bulbId) {
-      state.selectedBulb = state.bulbs.children.filter(function(bulb) {
+      state.selectedBulb = state.bulbs.children.filter(function (bulb) {
         return bulb.id == bulbId
       }).length == 1 ? bulbId : 0
     }
