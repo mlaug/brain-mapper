@@ -25,7 +25,6 @@
     <mapping></mapping>
 
   </section>
-
 </template>
 
 <script>

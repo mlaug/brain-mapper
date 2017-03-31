@@ -2,11 +2,6 @@ import axios from 'axios'
 
 export const STORAGE_KEY = 'eventStoreQueue'
 
-// for testing
-if (navigator.userAgent.indexOf('PhantomJS') > -1) {
-  window.localStorage.clear()
-}
-
 function b(a) {
   return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b)
 }
@@ -41,12 +36,11 @@ export const eventstoreProcessor = (event) => {
   }).then(response => {
     let queue = JSON.parse(window.localStorage.getItem(STORAGE_KEY))
     let queueWithoutProcessedElement = queue.filter((item) => {
-      console.log( item.uid != event.uid)
       return item.uid != event.uid
     })
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(queueWithoutProcessedElement))
   }).catch(response => {
-    console.log("Something went wrong while storing the event to the event store in the backend")
+
   })
 }
 
@@ -70,7 +64,11 @@ export const Eventstore = store => {
   })
 }
 
-setInterval(() => {
+export const eventstoreInterval = (callback) => {
   let queue = JSON.parse(window.localStorage.getItem(STORAGE_KEY)) || []
-  if ( queue.length > 0 ) eventstoreProcessor(queue.shift())
-}, 5000)
+  if (queue.length > 0) callback(queue.shift())
+}
+
+setInterval(() => {
+  eventstoreInterval(eventstoreProcessor())
+}, 1000)

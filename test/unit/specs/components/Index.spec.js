@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Index from '@/components/Index'
-import { store } from '../../../../src/store/bulbs'
+import { store } from '@/store/bulbs'
 
 const Mock = Vue.component("mapping", {
   template: "<div></div>"
