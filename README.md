@@ -2,6 +2,11 @@
 
 > Mapping Tool
 
+## Overview
+
+1) Frontend loads current snapshot from knowledge base to build up map
+2) New information are being stored locally and asynchronously synced as event from VUEX to EventStore
+
 ## Build Setup
 
 ``` bash

@@ -33,24 +33,34 @@ describe('bulbs store', () => {
   it('should be able to select a bulb', () => {
     expect(store.state.selectedBulb).to.be.equal(0)
     store.commit("addBulb", {title: "samson"})
-    store.commit("select", 1)
-    expect(store.state.selectedBulb).to.be.equal(1)
+    store.commit("select", store.state.bulbs.children[0].id)
+    expect(store.state.selectedBulb).to.be.equal(store.state.bulbs.children[0].id)
+    store.commit("addBulb", {title: "child of child"})
+    store.commit("select", store.state.bulbs.children[0].children[0].id)
+    expect(store.state.selectedBulb).to.be.equal(store.state.bulbs.children[0].children[0].id)
+  })
+
+  it('should select 0 by default if bulb cannot be found', () => {
     store.commit("select", 41983127912379)
     expect(store.state.selectedBulb).to.be.equal(0)
   })
 
   it('should add a bulb as child of selected bulb', () => {
-    store.state.bulbs = {
-      title: "Bulbs",
-        children: []
-    }
+    store.commit("reset")
+
     store.commit("addBulb", {title: "samson"})
-    expect(store.state.bulbs.children[0].id).to.be.equal(5)
-    store.commit("select", 5)
+    expect(store.state.bulbs.children[0].id).to.be.equal(1)
     expect(store.state.bulbs.children[0].children.length).to.be.equal(0)
+
+    store.commit("select", 1)
     store.commit("addBulb", {title: "child"})
     expect(store.state.bulbs.children[0].children.length).to.be.equal(1)
-    expect(store.state.bulbs.children[0].children[0].id).to.be.equal(6)
+    expect(store.state.bulbs.children[0].children[0].id).to.be.equal(2)
+
+    store.commit("select", 2)
+    store.commit("addBulb", {title: "child of child"})
+    expect(store.state.bulbs.children[0].children[0].children.length).to.be.equal(1)
+    expect(store.state.bulbs.children[0].children[0].children[0].id).to.be.equal(3)
   })
 
 })

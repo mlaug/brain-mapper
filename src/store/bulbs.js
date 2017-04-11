@@ -21,6 +21,7 @@ export const store = new Vuex.Store({
     topics: [],
 
     bulbs: {
+      id: 0,
       title: "Bulbs",
       children: []
     },
@@ -31,14 +32,27 @@ export const store = new Vuex.Store({
 
   mutations: {
 
-    addBulb (state, bulb, topicId) {
-      const topicToAddTo = state.topics.find(function (topic) {
-        return topic.id == topicId
-      })
+    reset (state) {
+      uid = 1
+      tuid = 1
+      state.bulbs = {
+        id: 0,
+        title: "Bulbs",
+        children: []
+      }
+    },
 
-      const bulbToAddTo = state.bulbs.children.find(function (bulb) {
-          return state.selectedBulb == bulb.id
-        }) || state.bulbs
+    addBulb (state, bulb) {
+
+      let search = (bulb, searchList) => {
+        searchList = searchList.concat(bulb.children)
+        if ( bulb.id == state.selectedBulb ) return bulb
+        if ( searchList.length == 0 ) return state.bulbs
+        let nextBulb = searchList.pop()
+        return search(nextBulb, searchList)
+      }
+
+      let bulbToAddTo = search(state.bulbs, [])
 
       bulb.id = uid++
       bulb.children = []
@@ -52,9 +66,12 @@ export const store = new Vuex.Store({
     },
 
     select (state, bulbId) {
-      state.selectedBulb = state.bulbs.children.filter(function (bulb) {
-        return bulb.id == bulbId
-      }).length == 1 ? bulbId : 0
+      let search = bulb => {
+        if ( bulb.id == bulbId ) return bulbId
+        if ( bulb.children.length == 0 ) return 0
+        return bulb.children.map(search).reduce((a,b) => a + b)
+      }
+      state.selectedBulb = search(state.bulbs)
     }
 
   }

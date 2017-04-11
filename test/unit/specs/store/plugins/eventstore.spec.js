@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {eventstoreInterval, eventstoreProcessor, eventstoreQueue, STORAGE_KEY} from '@/store/plugins/eventstore.js'
+import {eventstoreIntervalTick, eventstoreProcessor, eventstoreQueue, STORAGE_KEY} from '@/store/plugins/eventstore.js'
 
 describe('event store', () => {
 
@@ -14,13 +14,20 @@ describe('event store', () => {
     sandbox.restore()
   })
 
+  it('should not react on another event type but [addBulb]', () => {
+    const storageSetItemSpy = sandbox.spy(window.localStorage, "setItem")
+    const storageGetItemSpy = sandbox.spy(window.localStorage, "getItem")
+    eventstoreQueue({type: "wrongEvent", payload: "samson"})
+    sinon.assert.notCalled(storageGetItemSpy)
+    sinon.assert.notCalled(storageSetItemSpy)
+  })
+
   it('should be able to add an event to the queue and store it in the local storage to recover reload', () => {
     const storageSetItemSpy = sandbox.spy(window.localStorage, "setItem")
     const storageGetItemSpy = sandbox.spy(window.localStorage, "getItem")
-    eventstoreQueue({type: "addSomething", payload: "samson"})
+    eventstoreQueue({type: "addBulb", payload: "samson"})
     sinon.assert.calledOnce(storageGetItemSpy)
     sinon.assert.calledOnce(storageSetItemSpy)
-
   })
 
   it('should be able to process an event and send it to the event store backend and remove from queue', (done) => {
@@ -76,6 +83,7 @@ describe('event store', () => {
       },
       uuid: "C322E299-CB73-4B47-97C5-5054F920746E"
     }
+
     const storageSetItemSpy = sandbox.spy(window.localStorage, "setItem")
     const storageGetItemStub = sandbox.spy(window.localStorage, "getItem")
 
@@ -101,9 +109,17 @@ describe('event store', () => {
     const storageGetItemStub = sandbox.stub(window.localStorage, "getItem", () => {
       return JSON.stringify(events)
     })
-    eventstoreInterval(function (event) {
+    eventstoreIntervalTick(function (event) {
       expect(event).to.be.equal(1)
     })
+  })
+
+  it('should send nothing if storage is empty', () => {
+    const callback = sandbox.mock()
+    const storageGetItemStub = sandbox.stub(window.localStorage, "getItem")
+    storageGetItemStub.returns(JSON.stringify([]))
+    eventstoreIntervalTick(callback)
+    sinon.assert.notCalled(callback)
   })
 
 })

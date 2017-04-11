@@ -45,17 +45,17 @@ export const eventstoreProcessor = (event) => {
 }
 
 export const eventstoreQueue = (mutation) => {
+  if ( ["addBulb"].includes(mutation.type) ) {
+    const event = {
+      uid: uuid(),
+      event: mutation.type,
+      payload: mutation.payload
+    }
 
-  const event = {
-    uid: uuid(),
-    event: mutation.type,
-    payload: mutation.payload
+    let queue = JSON.parse(window.localStorage.getItem(STORAGE_KEY)) || []
+    queue.push(event)
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(queue))
   }
-
-  let queue = JSON.parse(window.localStorage.getItem(STORAGE_KEY)) || []
-  queue.push(event)
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(queue))
-
 }
 
 export const Eventstore = store => {
@@ -64,11 +64,11 @@ export const Eventstore = store => {
   })
 }
 
-export const eventstoreInterval = (callback) => {
+export const eventstoreIntervalTick = (callback) => {
   let queue = JSON.parse(window.localStorage.getItem(STORAGE_KEY)) || []
   if (queue.length > 0) callback(queue.shift())
 }
 
 setInterval(() => {
-  eventstoreInterval(eventstoreProcessor())
+  eventstoreIntervalTick(eventstoreProcessor)
 }, 1000)
