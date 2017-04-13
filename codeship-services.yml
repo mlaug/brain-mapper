@@ -1,5 +1,8 @@
 version: '2'
 
+app:
+  build: .
+
 services:
   aws_dockercfg:
     image: codeship/aws-ecr-dockercfg-generator
