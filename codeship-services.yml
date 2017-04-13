@@ -2,8 +2,9 @@ version: '2'
 
 services:
   app:
-    image: brain/mapper
-    dockerfile: Dockerfile
+    build:
+      image: brain/mapper
+      dockerfile: Dockerfile
 
   aws_dockercfg:
     image: codeship/aws-ecr-dockercfg-generator
