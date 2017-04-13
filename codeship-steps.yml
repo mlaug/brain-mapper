@@ -5,9 +5,6 @@
   tag: master
   command: npm run build
 - service: app
-  tag: master
-  command: cp ./dist /usr/share/nginx/html
-- service: app
   type: push
   tag: master
   image_name: brain/mapper
