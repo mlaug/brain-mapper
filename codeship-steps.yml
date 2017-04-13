@@ -5,8 +5,11 @@
   tag: master
   command: npm run build
 - service: app
+  tag: master
+  command: cp ./dist /usr/share/nginx/html
+- service: app
   type: push
   tag: master
-  image_name: 239402555961.dkr.ecr.eu-central-1.amazonaws.com/brain/mapper
+  image_name: brain/mapper
   registry: https://239402555961.dkr.ecr.eu-central-1.amazonaws.com/brain
   dockercfg_service: aws_dockercfg

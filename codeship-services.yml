@@ -2,7 +2,7 @@ version: '2'
 
 services:
   app:
-    build: .
+    image: nginx:1.11.13
 
   aws_dockercfg:
     image: codeship/aws-ecr-dockercfg-generator
