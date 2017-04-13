@@ -29,7 +29,11 @@
 
 <script>
 
+  // FIXME: good lord, this is crap, how to I get the references
+  // from the store commits
+  var _uid = 1;
   import Mapping from './Mapping'
+  import * as d3 from 'd3'
 
   const app = {
 
@@ -99,6 +103,29 @@
         })
 
         this.newBulb = ''
+
+        // TODO: should be separate function
+        let canvas = document.createElement("canvas")
+        canvas.width = 600
+        canvas.height = 600
+        let ctx = canvas.getContext("2d")
+        ctx.drawImage(this.$refs.video, 0, 0, canvas.width, canvas.height)
+
+        let defs = d3.select("defs")
+        defs.append("pattern")
+          .attr("id", "bulbBackground-" + _uid++)
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("patternContentUnits", "objectBoundingBox")
+          .attr("height", "100%")
+          .attr("width", "100%")
+          .append("image")
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("width", 1)
+          .attr("height", 1)
+          .attr("xlink:href", canvas.toDataURL("image/png"))
+
       }
 
     },

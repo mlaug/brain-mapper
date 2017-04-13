@@ -38,14 +38,7 @@ module.exports = {
   },
 
   'should be able to select a bulb': function (browser) {
-    const devServer = browser.globals.devServerURL
-    browser
-      .url(devServer)
-      .waitForElementVisible('#app', 5000)
-      .setValue('input.new-bulb', ['this is my new bulb', browser.Keys.ENTER])
-      .waitForElementVisible('.node', 1000)
-      .click(".node:first")
-      .end()
-  }
+
+  },
 
 }

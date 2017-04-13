@@ -87,6 +87,9 @@
             });
 
           node.append("circle")
+            .attr("fill", function (d) {
+              return "url(#bulbBackground-" + d.data.id + ")"
+            })
             .attr("r", function (d) {
               return d.r;
             })

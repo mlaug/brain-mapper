@@ -2,6 +2,10 @@ import {store} from '@/store/bulbs.js'
 
 describe('bulbs store', () => {
 
+  beforeEach(function () {
+    store.commit("reset")
+  });
+
   it('should be able to add a topic', () => {
     expect(store.state.topics.length).to.be.equal(0)
     store.commit("addTopic", {title: "myTopic"})
@@ -46,8 +50,6 @@ describe('bulbs store', () => {
   })
 
   it('should add a bulb as child of selected bulb', () => {
-    store.commit("reset")
-
     store.commit("addBulb", {title: "samson"})
     expect(store.state.bulbs.children[0].id).to.be.equal(1)
     expect(store.state.bulbs.children[0].children.length).to.be.equal(0)
@@ -61,6 +63,20 @@ describe('bulbs store', () => {
     store.commit("addBulb", {title: "child of child"})
     expect(store.state.bulbs.children[0].children[0].children.length).to.be.equal(1)
     expect(store.state.bulbs.children[0].children[0].children[0].id).to.be.equal(3)
+  })
+
+  it('should store a bulb via action to retrieve id asynchronously', (done) => {
+    store.dispatch('addBulb', {title: "samson"})
+      .then((id) => {
+        // FIXME: if one of those expectations fails, the pormise fails
+        expect(id).to.be.equal(1)
+        expect(store.state.bulbs.children[0].id).to.be.equal(1)
+        expect(store.state.bulbs.children[0].children.length).to.be.equal(0)
+        done()
+      })
+      .catch(() => {
+        done(new Error("promise didn't finish succesfully"))
+      })
   })
 
 })
