@@ -29,9 +29,6 @@
 
 <script>
 
-  // FIXME: good lord, this is crap, how to I get the references
-  // from the store commits
-  var _uid = 1;
   import Mapping from './Mapping'
   import * as d3 from 'd3'
 
@@ -98,33 +95,35 @@
           return
         }
 
-        this.$store.commit("addBulb", {
+        var self = this
+        this.$store.dispatch("addBulb", {
           title: value
+        }).then((uuid) => {
+
+          let canvas = document.createElement("canvas")
+          canvas.width = 600
+          canvas.height = 600
+          let ctx = canvas.getContext("2d")
+          ctx.drawImage(self.$refs.video, 0, 0, canvas.width, canvas.height)
+
+          let defs = d3.select("defs")
+          defs.append("pattern")
+            .attr("id", "bulbBackground-" + uuid)
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("patternContentUnits", "objectBoundingBox")
+            .attr("height", "100%")
+            .attr("width", "100%")
+            .append("image")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", 1)
+            .attr("height", 1)
+            .attr("xlink:href", canvas.toDataURL("image/png"))
+
         })
 
         this.newBulb = ''
-
-        // TODO: should be separate function
-        let canvas = document.createElement("canvas")
-        canvas.width = 600
-        canvas.height = 600
-        let ctx = canvas.getContext("2d")
-        ctx.drawImage(this.$refs.video, 0, 0, canvas.width, canvas.height)
-
-        let defs = d3.select("defs")
-        defs.append("pattern")
-          .attr("id", "bulbBackground-" + _uid++)
-          .attr("x", 0)
-          .attr("y", 0)
-          .attr("patternContentUnits", "objectBoundingBox")
-          .attr("height", "100%")
-          .attr("width", "100%")
-          .append("image")
-          .attr("x", 0)
-          .attr("y", 0)
-          .attr("width", 1)
-          .attr("height", 1)
-          .attr("xlink:href", canvas.toDataURL("image/png"))
 
       }
 
@@ -163,7 +162,7 @@
     background: #f5f5f5;
     color: #4d4d4d;
     min-width: 230px;
-    max-width: 550px;
+    max-width: 850px;
     margin: 0 auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -258,27 +257,6 @@
     display: none;
   }
 
-  .toggle-all {
-    position: absolute;
-    top: -55px;
-    left: -12px;
-    width: 60px;
-    height: 34px;
-    text-align: center;
-    border: none; /* Mobile Safari */
-  }
-
-  .toggle-all:before {
-    content: '❯';
-    font-size: 22px;
-    color: #e6e6e6;
-    padding: 10px 27px 10px 27px;
-  }
-
-  .toggle-all:checked:before {
-    color: #737373;
-  }
-
   .bulb-list {
     margin: 0;
     padding: 0;
@@ -293,44 +271,6 @@
 
   .bulb-list li:last-child {
     border-bottom: none;
-  }
-
-  .bulb-list li.editing {
-    border-bottom: none;
-    padding: 0;
-  }
-
-  .bulb-list li.editing .edit {
-    display: block;
-    width: 506px;
-    padding: 12px 16px;
-    margin: 0 0 0 43px;
-  }
-
-  .bulb-list li.editing .view {
-    display: none;
-  }
-
-  .bulb-list li .toggle {
-    text-align: center;
-    width: 40px;
-    /* auto, since non-WebKit browsers doesn't support input styling */
-    height: auto;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    margin: auto 0;
-    border: none; /* Mobile Safari */
-    -webkit-brainearance: none;
-    brainearance: none;
-  }
-
-  .bulb-list li .toggle:after {
-    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#ededed" stroke-width="3"/></svg>');
-  }
-
-  .bulb-list li .toggle:checked:after {
-    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -18 100 135"><circle cx="50" cy="50" r="50" fill="none" stroke="#bddad5" stroke-width="3"/><path fill="#5dc2af" d="M72 25L42 71 27 56l-4 4 20 20 34-52z"/></svg>');
   }
 
   .bulb-list li label {

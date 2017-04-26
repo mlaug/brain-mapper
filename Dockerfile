@@ -12,5 +12,6 @@ RUN mkdir -p /usr/app && cp -a /tmp/node_modules /usr/app
 
 WORKDIR /usr/app
 COPY ./ /usr/app/
+RUN cd /usr/app && npm run build
 RUN rm rm -rf /usr/share/nginx/html
 RUN cd /usr/share/nginx && ln -nsf /usr/app/dist html

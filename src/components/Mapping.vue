@@ -20,18 +20,32 @@
 
   import * as d3 from 'd3'
 
+  var w = 800,
+    h = 800,
+    r = 720,
+    vis
+
   const app = {
 
     name: 'mapping',
 
     data: function () {
       return {
-        bulbs: this.$store.state.bulbs
+        bulbs: this.$store.state.bulbs,
+        selectedNode: undefined
       }
     },
 
     mounted: function () {
-      this.drawMap()
+      vis = d3.select("svg")
+        .attr("width", w)
+        .attr("height", h)
+        .append("svg:g")
+        .attr("transform", "translate(" + (w - r) / 2 + "," + (h - r) / 2 + ")");
+      const self = this
+      this.$store.dispatch("loadBulbs").then(() => {
+        self.drawMap()
+      })
     },
 
     // watch bulbs change for localStorage persistence
@@ -51,85 +65,123 @@
     methods: {
 
       drawMap: function () {
-        try {
-          const self = this
 
-          // I guess this can be done more performant
-          d3.select("svg").selectAll("g").remove()
+        var x = d3.scaleLinear().range([0, r]),
+          y = d3.scaleLinear().range([0, r]),
+          node,
+          root,
+          self = this
 
-          var svg = d3.select("svg")
-          // FIXME: this throws an exception in the unit test on select an attribute
-          var diameter = +svg.attr("width")
-          var g = svg.append("g").attr("transform", "translate(2,2)")
-          var format = d3.format(",d")
+        var pack = d3.pack().size([r, r])
 
-          var pack = d3.pack()
-            .size([diameter - 414, diameter - 414])
+        var nodes = root = d3.hierarchy(this.bulbs).sum(function (d) {
+          return 10
+        })
 
-          var rootElement = d3.hierarchy(this.bulbs).sum(function (d) {
-            return (d.id || 0) + 10;
+        vis.selectAll("circle")
+          .data(pack(nodes).descendants())
+          .attr("cx", function (d) {
+            return d.x;
           })
+          .attr("cy", function (d) {
+            return d.y;
+          })
+          .attr("r", function (d) {
+            return d.r;
+          })
+          .enter()
+          .append("svg:circle")
+          .attr("fill", function (d) {
+            return "url(#bulbBackground-" + d.data.uuid + ")"
+          })
+          .attr("class", function (d) {
+            return d.children ? "parent" : "child";
+          })
+          .attr("cx", function (d) {
+            return d.x;
+          })
+          .attr("cy", function (d) {
+            return d.y;
+          })
+          .attr("r", function (d) {
+            return d.r;
+          })
+          .on("click", function (d) {
+            self.$store.commit("select", d.data.uuid)
+            return zoom(node == d ? root : d);
+          });
 
-          var node = g.selectAll(".node")
-            .data(pack(rootElement).descendants())
-            .enter()
-            .append("g")
-            .attr("class", function (d) {
-              return d.children ? "node" : "leaf node";
+        /*vis.selectAll("text")
+          .data(pack(nodes).descendants())
+          .attr("x", function (d) {
+            return d.x;
+          })
+          .attr("y", function (d) {
+            return d.y;
+          })
+          .enter().append("svg:text")
+          .attr("class", function (d) {
+            return d.children ? "parent" : "child";
+          })
+          .attr("x", function (d) {
+            return d.x;
+          })
+          .attr("y", function (d) {
+            return d.y;
+          })
+          .attr("dy", ".35em")
+          .attr("text-anchor", "middle")
+          .style("opacity", function (d) {
+            return d.r > 20 ? 1 : 0;
+          })
+          .text(function (d) {
+            return d.data.title;
+          });
+
+        /*d3.select(window).on("click", function () {
+         self.$store.commit("select", 0)
+         zoom(root);
+         })*/
+
+        function zoom(d, duration) {
+
+          duration = duration === undefined ? 750 : duration
+
+          var k = r / d.r / 2;
+          x.domain([d.x - d.r, d.x + d.r]);
+          y.domain([d.y - d.r, d.y + d.r]);
+
+          var t = vis.transition()
+            .duration(duration);
+
+          t.selectAll("circle")
+            .attr("cx", function (d) {
+              return x(d.x);
             })
-            .attr("transform", function (d) {
-              return "translate(" + d.x + "," + d.y + ")";
-            });
-
-          node.append("title")
-            .text(function (d) {
-              return d.data.title + "\n" + format(d.data.id || 0);
-            });
-
-          node.append("circle")
-            .attr("fill", function (d) {
-              return "url(#bulbBackground-" + d.data.id + ")"
-            })
-            .attr("r", function (d) {
-              return d.r;
-            })
-            .on("click", function (d) {
-              self.$store.commit("select", d.data.id)
-            })
-
-          node.filter(function (d) {
-            return !d.children;
-          }).append("text")
-            .attr("dy", "0.3em")
-            .text(function (d) {
-              return d.data.title.substring(0, d.r / 3);
-            });
-
-          var gInner = node.filter(function (d) {
-            return d.depth <= 2 && (!d.children || d.children.length < 4)
-          }).append("g");
-
-          gInner.append("title")
-            .append("text")
-            .text(function (d) {
-              return "Add new element to " + d.data.title
-            })
-
-          gInner.append("circle")
-            .attr("fill", "url(#add)")
             .attr("cy", function (d) {
-              return d.r - 10
+              return y(d.y);
             })
             .attr("r", function (d) {
-              return 10
-            })
-            .on("click", function () {
-              alert("adding new item")
-            })
-        }
-        catch (e) {
+              return k * d.r;
+            });
 
+          t.selectAll("text")
+            .attr("x", function (d) {
+              return x(d.x);
+            })
+            .attr("y", function (d) {
+              return y(d.y);
+            })
+            .style("opacity", function (d) {
+              return k * d.r > 20 ? 1 : 0;
+            });
+
+          node = self.selectedNode = d;
+          d3.event ? d3.event.stopPropagation() : undefined;
         }
+
+        zoom(this.selectedNode ? this.selectedNode : root, 0)
+
       }
     },
 
