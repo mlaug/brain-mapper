@@ -118,12 +118,12 @@ describe('bulbs store', () => {
     })
 
     store.dispatch('loadBulbs')
-      .then((bulbs) => {
-        done(new Error("this should not have happened"))
-      })
-      .catch((error) => {
+      .then(() => {
         expect(store.state.bulbs).to.be.not.null
         done()
+      })
+      .catch((error) => {
+        done(new Error("this should not have happened"))
       })
   })
 

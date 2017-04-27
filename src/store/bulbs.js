@@ -58,7 +58,6 @@ export const store = new Vuex.Store({
   mutations: {
 
     reset (state) {
-      tuid = 1
       state.bulbs = {
         uuid: ROOT_ELEMENT,
         title: "Bulbs",
@@ -92,13 +91,17 @@ export const store = new Vuex.Store({
       bulbToAddTo.children.push(bulb)
     },
 
-    select (state, bulbId) {
-      let search = bulb => {
-        if (bulb.uuid == bulbId) return bulbId
-        if (bulb.children.length == 0) return 0
-        return bulb.children.map(search).reduce((a, b) => a + b)
+    select (state, bulbUuid) {
+      // TODO: maybe there is a way to create a generic method
+      // so it is not that redundant with the search method from 'addBulb'
+      let search = (bulb, bulbUuid, searchList) => {
+        searchList = searchList.concat(bulb.children)
+        if (bulb.uuid === bulbUuid) return bulb.uuid
+        if (searchList.length == 0) return ROOT_ELEMENT
+        let nextBulb = searchList.pop()
+        return search(nextBulb, bulbUuid, searchList)
       }
-      state.selectedBulb = search(state.bulbs)
+      state.selectedBulb = search(state.bulbs, bulbUuid, [])
     },
 
   }
