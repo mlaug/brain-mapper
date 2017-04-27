@@ -15,14 +15,6 @@ describe('bulbs store', () => {
     sandbox.restore()
   })
 
-  it('should be able to add a topic', () => {
-    expect(store.state.topics.length).to.be.equal(0)
-    store.commit("addTopic", {title: "myTopic"})
-    expect(store.state.topics.length).to.be.equal(1)
-    expect(store.state.topics[0].title).to.be.equal("myTopic")
-    expect(store.state.topics[0].bulbs.children.length).to.be.equal(0)
-  })
-
   it('should have an initial empty root element', () => {
     expect(store.state.bulbs.title).to.be.equal("Bulbs")
     expect(store.state.bulbs.children.length).to.be.equal(0)
@@ -67,6 +59,9 @@ describe('bulbs store', () => {
     store.commit("addBulb", {title: "child"})
     expect(store.state.bulbs.children[0].children.length).to.be.equal(1)
     expect(store.state.bulbs.children[0].children[0].uuid).to.be.not.null
+    expect(store.state.bulbs.children[0].children[0]._parentUuid).to.be.equal(
+      store.state.bulbs.children[0].uuid
+    )
 
     store.commit("select", store.state.bulbs.children[0].children[0].uuid)
     store.commit("addBulb", {title: "child of child"})
@@ -117,7 +112,7 @@ describe('bulbs store', () => {
       })
   })
 
-  it('should behave well on error', (done) => {
+  it('should load default bulb structure on failure loading', (done) => {
     axiosPostStub = sandbox.stub(axios, "get", () => {
       return Promise.reject(new Error("something went terrible wrong"))
     })
@@ -127,6 +122,7 @@ describe('bulbs store', () => {
         done(new Error("this should not have happened"))
       })
       .catch((error) => {
+        expect(store.state.bulbs).to.be.not.null
         done()
       })
   })

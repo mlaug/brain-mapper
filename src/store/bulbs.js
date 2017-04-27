@@ -6,12 +6,9 @@ import uuid from '../common/uuid'
 
 Vue.use(Vuex)
 
-// FIXME: is this cool using those ids until a reload
-// when they would be replaced with the real IDs generated in the backend
-var tuid = 1
 const ROOT_ELEMENT = 0
-
 const protoBulbs = {
+  uuid: ROOT_ELEMENT,
   title: "Bulbs",
   children: []
 }
@@ -24,11 +21,7 @@ export const store = new Vuex.Store({
 
     topics: [],
 
-    bulbs: {
-      uuid: ROOT_ELEMENT,
-      title: "Bulbs",
-      children: []
-    },
+    bulbs: protoBulbs,
 
     selectedBulb: ROOT_ELEMENT
 
@@ -52,7 +45,9 @@ export const store = new Vuex.Store({
             resolve(response.data)
           })
           .catch((error) => {
-            reject(error)
+            console.log(error)
+            // TODO: is this a good idea, how about later syncs?
+            resolve(protoBulbs)
           })
       })
 
@@ -72,7 +67,11 @@ export const store = new Vuex.Store({
     },
 
     loadBulbs(state, bulbs) {
-      state.bulbs = bulbs
+      // FIXME: this doesnt look to smart ...
+      // FIXME: apparently overwritting the initial state kills the overserver and no handler is triggered anymore
+      state.bulbs.children = []
+      state.bulbs.children.push(bulbs)
+      state.selectedBulb = bulbs.uuid
     },
 
     addBulb (state, bulb) {
@@ -80,7 +79,7 @@ export const store = new Vuex.Store({
 
       let search = (bulb, searchList) => {
         searchList = searchList.concat(bulb.children)
-        if (bulb.uuid == state.selectedBulb) return bulb
+        if (bulb.uuid === state.selectedBulb) return bulb
         if (searchList.length == 0) return state.bulbs
         let nextBulb = searchList.pop()
         return search(nextBulb, searchList)
@@ -89,6 +88,7 @@ export const store = new Vuex.Store({
       let bulbToAddTo = search(state.bulbs, [])
 
       bulb.children = []
+      bulb._parentUuid = state.selectedBulb
       bulbToAddTo.children.push(bulb)
     },
 
@@ -100,12 +100,6 @@ export const store = new Vuex.Store({
       }
       state.selectedBulb = search(state.bulbs)
     },
-
-    addTopic(state, topic) {
-      topic.id = tuid++
-      topic.bulbs = Object.assign({}, protoBulbs)
-      state.topics.push(topic)
-    }
 
   }
 

@@ -111,38 +111,6 @@
             return zoom(node == d ? root : d);
           });
 
-        /*vis.selectAll("text")
-          .data(pack(nodes).descendants())
-          .attr("x", function (d) {
-            return d.x;
-          })
-          .attr("y", function (d) {
-            return d.y;
-          })
-          .enter().append("svg:text")
-          .attr("class", function (d) {
-            return d.children ? "parent" : "child";
-          })
-          .attr("x", function (d) {
-            return d.x;
-          })
-          .attr("y", function (d) {
-            return d.y;
-          })
-          .attr("dy", ".35em")
-          .attr("text-anchor", "middle")
-          .style("opacity", function (d) {
-            return d.r > 20 ? 1 : 0;
-          })
-          .text(function (d) {
-            return d.data.title;
-          });
-
-        /*d3.select(window).on("click", function () {
-         self.$store.commit("select", 0)
-         zoom(root);
-         })*/
-
         function zoom(d, duration) {
 
           duration = duration === undefined ? 750 : duration
