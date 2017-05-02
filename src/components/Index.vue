@@ -41,6 +41,7 @@
     },
 
     data: function () {
+
       return {
         bulbs: this.$store.state.bulbs,
 
@@ -52,11 +53,12 @@
         },
 
         newBulb: ''
+
       }
     },
 
-    // watch bulbs change for localStorage persistence
     watch: {
+
       showMedia: {
         handler: function (show) {
           if (show) {
@@ -77,27 +79,24 @@
           }
         }
       }
+
     },
 
     methods: {
 
       search: function () {
-        const self = this
-        this.$store.state.bulbs.children.filter(function (bulb) {
-          return self.newBulb.length == 0 || bulb.title.indexOf(self.newBulb) >= 0
-        })
+
       },
 
       addBulb: function () {
-        var value = this.newBulb && this.newBulb.trim()
 
-        if (value.length == 0) {
+        if (this.newBulb.length == 0) {
           return
         }
 
         var self = this
         this.$store.dispatch("addBulb", {
-          title: value
+          summary: self.newBulb
         }).then((uuid) => {
 
           let canvas = document.createElement("canvas")
@@ -241,85 +240,34 @@
     box-shadow: inset 0 -2px 1px rgba(0, 0, 0, 0.03);
   }
 
+  textarea {
+    margin-top: 10px;
+    margin-left: 50px;
+    width: 80%;
+    height: 100px;
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.003);
+    box-shadow: inset 0 -2px 1px rgba(0, 0, 0, 0.03);
+    color: #555555;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 1em;
+    line-height: 1.4em;
+    padding: 5px 8px;
+    transition: background-color 0.2s ease 0s;
+  }
+
+
   .media {
     position: relative;
     float: right;
     margin: 0px;
   }
 
-  .main {
-    position: relative;
-    z-index: 2;
-    border-top: 1px solid #e6e6e6;
-  }
-
   label[for='toggle-all'] {
     display: none;
-  }
-
-  .bulb-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .bulb-list li {
-    position: relative;
-    font-size: 24px;
-    border-bottom: 1px solid #ededed;
-  }
-
-  .bulb-list li:last-child {
-    border-bottom: none;
-  }
-
-  .bulb-list li label {
-    word-break: break-all;
-    padding: 15px 60px 15px 15px;
-    margin-left: 45px;
-    display: block;
-    line-height: 1.2;
-    transition: color 0.4s;
-  }
-
-  .bulb-list li.completed label {
-    color: #d9d9d9;
-    text-decoration: line-through;
-  }
-
-  .bulb-list li .destroy {
-    display: none;
-    position: absolute;
-    top: 0;
-    right: 10px;
-    bottom: 0;
-    width: 40px;
-    height: 40px;
-    margin: auto 0;
-    font-size: 30px;
-    color: #cc9a9a;
-    margin-bottom: 11px;
-    transition: color 0.2s ease-out;
-  }
-
-  .bulb-list li .destroy:hover {
-    color: #af5b5e;
-  }
-
-  .bulb-list li .destroy:after {
-    content: '×';
-  }
-
-  .bulb-list li:hover .destroy {
-    display: block;
-  }
-
-  .bulb-list li .edit {
-    display: none;
-  }
-
-  .bulb-list li.editing:last-child {
-    margin-bottom: -1px;
   }
 
   .footer {
@@ -345,102 +293,6 @@
     0 17px 2px -6px rgba(0, 0, 0, 0.2);
   }
 
-  .bulb-count {
-    float: left;
-    text-align: left;
-  }
-
-  .bulb-count strong {
-    font-weight: 300;
-  }
-
-  .filters {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    position: absolute;
-    right: 0;
-    left: 0;
-  }
-
-  .filters li {
-    display: inline;
-  }
-
-  .filters li a {
-    color: inherit;
-    margin: 3px;
-    padding: 3px 7px;
-    text-decoration: none;
-    border: 1px solid transparent;
-    border-radius: 3px;
-  }
-
-  .filters li a:hover {
-    border-color: rgba(175, 47, 47, 0.1);
-  }
-
-  .filters li a.selected {
-    border-color: rgba(175, 47, 47, 0.2);
-  }
-
-  .clear-completed,
-  html .clear-completed:active {
-    float: right;
-    position: relative;
-    line-height: 20px;
-    text-decoration: none;
-    cursor: pointer;
-  }
-
-  .clear-completed:hover {
-    text-decoration: underline;
-  }
-
-  .info {
-    margin: 65px auto 0;
-    color: #bfbfbf;
-    font-size: 10px;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    text-align: center;
-  }
-
-  .info p {
-    line-height: 1;
-  }
-
-  .info a {
-    color: inherit;
-    text-decoration: none;
-    font-weight: 400;
-  }
-
-  .info a:hover {
-    text-decoration: underline;
-  }
-
-  /*
-      Hack to remove background from Mobile Safari.
-      Can't use it globally since it destroys checkboxes in Firefox
-  */
-  @media screen and (-webkit-min-device-pixel-ratio: 0) {
-    .toggle-all,
-    .bulb-list li .toggle {
-      background: none;
-    }
-
-    .bulb-list li .toggle {
-      height: 40px;
-    }
-
-    .toggle-all {
-      -webkit-transform: rotate(90deg);
-      transform: rotate(90deg);
-      -webkit-brainearance: none;
-      brainearance: none;
-    }
-  }
-
   @media (max-width: 430px) {
     .footer {
       height: 50px;
@@ -450,4 +302,5 @@
       bottom: 10px;
     }
   }
+
 </style>

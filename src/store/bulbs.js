@@ -6,12 +6,7 @@ import uuid from '../common/uuid'
 
 Vue.use(Vuex)
 
-const ROOT_ELEMENT = 0
-const protoBulbs = {
-  uuid: ROOT_ELEMENT,
-  title: "Bulbs",
-  children: []
-}
+const protoBulbs = []
 
 export const store = new Vuex.Store({
 
@@ -19,11 +14,7 @@ export const store = new Vuex.Store({
 
   state: {
 
-    topics: [],
-
     bulbs: protoBulbs,
-
-    selectedBulb: ROOT_ELEMENT
 
   },
 
@@ -46,7 +37,6 @@ export const store = new Vuex.Store({
           })
           .catch((error) => {
             console.log(error)
-            // TODO: is this a good idea, how about later syncs?
             resolve(protoBulbs)
           })
       })
@@ -58,50 +48,22 @@ export const store = new Vuex.Store({
   mutations: {
 
     reset (state) {
-      state.bulbs = {
-        uuid: ROOT_ELEMENT,
-        title: "Bulbs",
-        children: []
-      }
+      state.bulbs = []
     },
 
     loadBulbs(state, bulbs) {
-      // FIXME: this doesnt look to smart ...
-      // FIXME: apparently overwritting the initial state kills the overserver and no handler is triggered anymore
-      state.bulbs.children = []
-      state.bulbs.children.push(bulbs)
-      state.selectedBulb = bulbs.uuid
+      bulbs.forEach((bulb) => {
+        state.bulbs.push(bulb)
+      })
     },
 
     addBulb (state, bulb) {
       bulb.uuid = bulb.uuid || uuid()
-
-      let search = (bulb, searchList) => {
-        searchList = searchList.concat(bulb.children)
-        if (bulb.uuid === state.selectedBulb) return bulb
-        if (searchList.length == 0) return state.bulbs
-        let nextBulb = searchList.pop()
-        return search(nextBulb, searchList)
-      }
-
-      let bulbToAddTo = search(state.bulbs, [])
-
-      bulb.children = []
-      bulb._parentUuid = state.selectedBulb
-      bulbToAddTo.children.push(bulb)
+      state.bulbs.push(bulb)
     },
 
     select (state, bulbUuid) {
-      // TODO: maybe there is a way to create a generic method
-      // so it is not that redundant with the search method from 'addBulb'
-      let search = (bulb, bulbUuid, searchList) => {
-        searchList = searchList.concat(bulb.children)
-        if (bulb.uuid === bulbUuid) return bulb.uuid
-        if (searchList.length == 0) return ROOT_ELEMENT
-        let nextBulb = searchList.pop()
-        return search(nextBulb, bulbUuid, searchList)
-      }
-      state.selectedBulb = search(state.bulbs, bulbUuid, [])
+      state.selectedBulb = bulbUuid
     },
 
   }

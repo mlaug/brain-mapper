@@ -33,12 +33,8 @@ module.exports = {
       .url(devServer)
       .waitForElementVisible('#app', 5000)
       .setValue('input.new-bulb', ['this is my new bulb', browser.Keys.ENTER])
-      .waitForElementVisible('.node', 1000)
+      .waitForElementVisible('.bulb', 1000)
       .end()
-  },
-
-  'should be able to select a bulb': function (browser) {
-
-  },
+  }
 
 }

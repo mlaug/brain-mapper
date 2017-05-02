@@ -4,7 +4,7 @@ import uuid from '../../common/uuid'
 export const STORAGE_KEY = 'eventStoreQueue'
 
 export const eventstoreProcessor = (event) => {
-  axios.post(process.env.eventstore.url + '/streams/knowledge', event.payload, {
+  axios.put(process.env.eventstore.url + '/streams/knowledge', event.payload, {
     headers: {
       "ES-EventType": event.event,
       "ES-EventId": event.uid

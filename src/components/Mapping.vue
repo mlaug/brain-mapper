@@ -2,15 +2,38 @@
 
   <section class="mapping">
 
-    <svg width="960" height="960" class="mapping-canvas">
-      <defs>
-        <pattern id="add" x="0" y="0" patternContentUnits="objectBoundingBox" height="100%" width="100%">
-          <image x="0" y="0"
-                 xlink:href="https://cdn2.iconfinder.com/data/icons/ios-7-tab-bar-icons/500/plus-512.png"
-                 preserveAspectRatio="none" width="1" height="1"></image>
-        </pattern>
-      </defs>
-    </svg>
+    <div class="bulb"
+         v-for="bulb in bulbs"
+         draggable="true"
+         ref="bulb"
+         v-on:dragstart="startBulbDrag"
+         v-on:dragover="dragBulbOver"
+         v-on:dragenter="dragBulbEnter"
+         v-on:dragleave="dragBulbLeave"
+         v-on:drop="dropBulb"
+         v-on:dragend="endBulbDrag">
+      <header>
+
+        <transition name="fade">
+          <p v-if="showInput">
+            <input
+              type="text"
+              name="title"
+              placeholder="Give it a title"
+              v-model="bulb.title"
+              v-on:focusout="showInput = !showInput"
+            />
+          </p>
+          <p
+            v-if="!showInput"
+            v-on:click="showInput = !showInput">
+            {{bulb.title||"no title"}}
+          </p>
+        </transition>
+
+      </header>
+      {{ bulb.summary }}
+    </div>
 
   </section>
 
@@ -20,11 +43,6 @@
 
   import * as d3 from 'd3'
 
-  var w = 800,
-    h = 800,
-    r = 720,
-    vis
-
   const app = {
 
     name: 'mapping',
@@ -32,124 +50,65 @@
     data: function () {
       return {
         bulbs: this.$store.state.bulbs,
-        selectedNode: undefined
+        dragSrcEl: null,
+        showInput: false
       }
     },
 
     mounted: function () {
-      vis = d3.select("svg")
-        .attr("width", w)
-        .attr("height", h)
-        .append("svg:g")
-        .attr("transform", "translate(" + (w - r) / 2 + "," + (h - r) / 2 + ")");
       const self = this
       this.$store.dispatch("loadBulbs").then(() => {
-        self.drawMap()
+
       })
     },
 
-    // watch bulbs change for localStorage persistence
-    watch: {
+    watch: {},
 
-      bulbs: {
-        handler: function () {
-          this.drawMap()
-        },
-        deep: true
-      }
-
-    },
-
-    // methods that implement data logic.
-    // note there's no DOM manipulation here at all.
     methods: {
 
-      drawMap: function () {
+      startBulbDrag: (e) => {
+        e.target.style.opacity = '0.4';
+        this.dragSrcEl = e.target;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', e.target.innerHTML)
+      },
 
-        var x = d3.scaleLinear().range([0, r]),
-          y = d3.scaleLinear().range([0, r]),
-          node,
-          root,
-          self = this
+      endBulbDrag: (e) => {
+        e.target.style.opacity = '1';
+        let cols = document.querySelectorAll('.bulb');
+        [].forEach.call(cols, function (col) {
+          col.classList.remove('over');
+        });
+      },
 
-        var pack = d3.pack().size([r, r])
-
-        var nodes = root = d3.hierarchy(this.bulbs).sum(function (d) {
-          return 10
-        })
-
-        vis.selectAll("circle")
-          .data(pack(nodes).descendants())
-          .attr("cx", function (d) {
-            return d.x;
-          })
-          .attr("cy", function (d) {
-            return d.y;
-          })
-          .attr("r", function (d) {
-            return d.r;
-          })
-          .enter()
-          .append("svg:circle")
-          .attr("fill", function (d) {
-            return "url(#bulbBackground-" + d.data.uuid + ")"
-          })
-          .attr("class", function (d) {
-            return d.children ? "parent" : "child";
-          })
-          .attr("cx", function (d) {
-            return d.x;
-          })
-          .attr("cy", function (d) {
-            return d.y;
-          })
-          .attr("r", function (d) {
-            return d.r;
-          })
-          .on("click", function (d) {
-            self.$store.commit("select", d.data.uuid)
-            return zoom(node == d ? root : d);
-          });
-
-        function zoom(d, duration) {
-
-          duration = duration === undefined ? 750 : duration
-
-          var k = r / d.r / 2;
-          x.domain([d.x - d.r, d.x + d.r]);
-          y.domain([d.y - d.r, d.y + d.r]);
-
-          var t = vis.transition()
-            .duration(duration);
-
-          t.selectAll("circle")
-            .attr("cx", function (d) {
-              return x(d.x);
-            })
-            .attr("cy", function (d) {
-              return y(d.y);
-            })
-            .attr("r", function (d) {
-              return k * d.r;
-            });
-
-          t.selectAll("text")
-            .attr("x", function (d) {
-              return x(d.x);
-            })
-            .attr("y", function (d) {
-              return y(d.y);
-            })
-            .style("opacity", function (d) {
-              return k * d.r > 20 ? 1 : 0;
-            });
-
-          node = self.selectedNode = d;
-          d3.event ? d3.event.stopPropagation() : undefined;
+      dropBulb: (e) => {
+        if (e.stopPropagation) {
+          e.stopPropagation(); // stops the browser from redirecting.
         }
 
-        zoom(this.selectedNode ? this.selectedNode : root, 0)
+        if (this.dragSrcEl != e.target) {
+          // Set the source column's HTML to the HTML of the columnwe dropped on.
+          this.dragSrcEl.innerHTML = e.target.innerHTML;
+          e.target.innerHTML = e.dataTransfer.getData('text/html');
+        }
 
+        return false
+      },
+
+      dragBulbEnter: (e) => {
+        e.target.classList.add('over');
+      },
+
+      dragBulbLeave: (e) => {
+        e.target.classList.remove('over');
+      },
+
+      dragBulbOver: (e) => {
+        if (e.preventDefault) {
+          e.preventDefault(); // Necessary. Allows us to drop.
+        }
+
+        e.dataTransfer.dropEffect = 'move';
       }
     },
 
@@ -160,19 +119,63 @@
 
 <style>
 
-  circle {
-    fill-opacity: .25;
-    stroke: rgb(31, 119, 180);
-    stroke-width: 1px;
+  .mapping {
+    height: 800px;
   }
 
-  .leaf circle {
-    fill-opacity: 0.5;
+  [draggable] {
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    /* Required to make elements draggable in old WebKit */
+    -khtml-user-drag: element;
+    -webkit-user-drag: element;
   }
 
-  text {
-    font: 10px sans-serif;
-    text-anchor: middle;
+  .bulb {
+    height: 150px;
+    width: 150px;
+    float: left;
+    border: 2px solid #666666;
+    background-color: #ccc;
+    margin: 8px;
+    -webkit-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 3px #000;
+    -ms-box-shadow: inset 0 0 3px #000;
+    box-shadow: inset 0 0 3px #000;
+    text-align: center;
+    cursor: move;
+  }
+
+  .bulb header {
+    color: #fff;
+    text-shadow: #000 0 1px;
+    box-shadow: 5px;
+    padding: 5px;
+    background: -moz-linear-gradient(left center, rgb(0, 0, 0), rgb(79, 79, 79), rgb(21, 21, 21));
+    background: -webkit-gradient(linear, left top, right top,
+    color-stop(0, rgb(0, 0, 0)),
+    color-stop(0.50, rgb(79, 79, 79)),
+    color-stop(1, rgb(21, 21, 21)));
+    background: -webkit-linear-gradient(left center, rgb(0, 0, 0), rgb(79, 79, 79), rgb(21, 21, 21));
+    background: -ms-linear-gradient(left center, rgb(0, 0, 0), rgb(79, 79, 79), rgb(21, 21, 21));
+    border-bottom: 1px solid #ddd;
+    -webkit-border-top-left-radius: 10px;
+    -moz-border-radius-topleft: 10px;
+    -ms-border-radius-topleft: 10px;
+    border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -ms-border-top-right-radius: 10px;
+    -moz-border-radius-topright: 10px;
+    border-top-right-radius: 10px;
+  }
+
+  .bulb.over {
+    border: 2px dashed #000;
   }
 
 </style>
