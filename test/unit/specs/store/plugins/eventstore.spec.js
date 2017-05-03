@@ -102,6 +102,38 @@ describe('event store', () => {
 
   })
 
+
+  it('should be able to process an update event', () => {
+
+    const event = {
+      event: "updateBulb",
+      payload: {
+        title: "mybulb"
+      },
+      uid: "C322E299-CB73-4B47-97C5-5054F920746E"
+    }
+
+
+    const storageSetItemSpy = sandbox.spy(window.localStorage, "setItem")
+    const storageGetItemStub = sandbox.stub(window.localStorage, "getItem")
+    storageGetItemStub.returns(JSON.stringify([event]))
+
+    const axiosPutStub = sandbox.stub(axios, "put", () => {
+      return Promise.resolve()
+    })
+
+    eventstoreProcessor(event)
+    sinon.assert.calledOnce(axiosPutStub)
+
+    sinon.assert.calledWith(axiosPutStub, sinon.match.any, event.payload, {
+      headers: {
+        "ES-EventType": event.event,
+        "ES-EventId": event.uid
+      }
+    })
+
+  })
+
   it('should through the elements into the processor by FIFO', () => {
     let events = []
     events.push(1)

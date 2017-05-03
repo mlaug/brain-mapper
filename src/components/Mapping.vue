@@ -15,24 +15,45 @@
       <header>
 
         <transition name="fade">
-          <p v-if="showInput">
+          <p v-if="showInput[bulb.uuid]">
             <input
+              v-bind:ref="'bulb-title-' + bulb.uuid"
               type="text"
               name="title"
               placeholder="Give it a title"
               v-model="bulb.title"
-              v-on:focusout="showInput = !showInput"
+              v-focus="showInput[bulb.uuid]"
+              v-on:focusout="bulbTitleFocusOutHandler(bulb.uuid)"
             />
           </p>
           <p
-            v-if="!showInput"
-            v-on:click="showInput = !showInput">
+            v-if="!showInput[bulb.uuid]"
+            @click="toggleShowInput(bulb.uuid)">
             {{bulb.title||"no title"}}
           </p>
         </transition>
 
       </header>
-      {{ bulb.summary }}
+
+      <transition name="fade">
+        <p  v-if="showSummaryInput[bulb.uuid]">
+          <textarea
+            v-bind:ref="'bulb-summary-' + bulb.uuid"
+            type="text"
+            name="title"
+            placeholder="Give it a summary"
+            v-model="bulb.summary"
+            v-focus="showSummaryInput[bulb.uuid]"
+            v-on:focusout="bulbSummaryFocusOutHandler(bulb.uuid)"
+          >{{ bulb.summary }}</textarea>
+        </p>
+        <p
+          v-if="!showSummaryInput[bulb.uuid]"
+          @click="toggleShowSummaryInput(bulb.uuid)">
+          {{ bulb.summary }}
+        </p>
+      </transition>
+
     </div>
 
   </section>
@@ -41,17 +62,21 @@
 
 <script>
 
-  import * as d3 from 'd3'
+  import Vue from 'vue'
+  import { focus } from 'vue-focus';
 
   const app = {
 
     name: 'mapping',
 
+    directives: { focus: focus },
+
     data: function () {
       return {
         bulbs: this.$store.state.bulbs,
         dragSrcEl: null,
-        showInput: false
+        showInput: {},
+        showSummaryInput: {}
       }
     },
 
@@ -65,6 +90,36 @@
     watch: {},
 
     methods: {
+
+      toggleShowInput(uuid) {
+        this.showInput[uuid] = !this.showInput[uuid]
+        this.showInput = Object.assign({}, this.showInput)
+        this.$refs["bulb-title-" - uuid].focus()
+      },
+
+      bulbTitleFocusOutHandler(uuid) {
+        this.update(uuid)
+        this.toggleShowInput(uuid)
+      },
+
+      toggleShowSummaryInput(uuid) {
+        this.showSummaryInput[uuid] = !this.showSummaryInput[uuid]
+        this.showSummaryInput = Object.assign({}, this.showSummaryInput)
+        this.$refs["bulb-summary-" - uuid].focus()
+      },
+
+      bulbSummaryFocusOutHandler(uuid) {
+        this.update(uuid)
+        this.toggleShowSummaryInput(uuid)
+      },
+
+      update(uuid) {
+        this.bulbs.filter((bulb) => {
+            return bulb.uuid === uuid
+        }).map((bulb) => {
+            this.$store.commit("updateBulb", bulb)
+        })
+      },
 
       startBulbDrag: (e) => {
         e.target.style.opacity = '0.4';
@@ -176,6 +231,13 @@
 
   .bulb.over {
     border: 2px dashed #000;
+  }
+
+  .bulb textarea {
+    background: white;
+    margin: 0;
+    width: 120px;
+    height: 80px;
   }
 
 </style>

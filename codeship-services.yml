@@ -6,6 +6,12 @@ services:
       image: 239402555961.dkr.ecr.eu-central-1.amazonaws.com/brain/mapper
       dockerfile: Dockerfile
 
+  eventstore:
+    image: "eventstore/eventstore"
+    ports:
+      - 2113:2113
+      - 1113:1113
+
   aws_dockercfg:
     image: codeship/aws-ecr-dockercfg-generator
     add_docker: true

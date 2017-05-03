@@ -62,6 +62,14 @@ export const store = new Vuex.Store({
       state.bulbs.push(bulb)
     },
 
+    updateBulb (state, bulbToUpdate) {
+      state.bulbs.filter((bulb) => {
+        return bulb.uuid === bulbToUpdate.uuid
+      }).map((bulb) => {
+        bulb = Object.assign(bulb, bulbToUpdate)
+      })
+    },
+
     select (state, bulbUuid) {
       state.selectedBulb = bulbUuid
     },

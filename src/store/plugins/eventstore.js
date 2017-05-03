@@ -4,7 +4,7 @@ import uuid from '../../common/uuid'
 export const STORAGE_KEY = 'eventStoreQueue'
 
 export const eventstoreProcessor = (event) => {
-  axios.put(process.env.eventstore.url + '/streams/knowledge', event.payload, {
+  axios.post(process.env.eventstore.url + '/streams/knowledge', event.payload, {
     headers: {
       "ES-EventType": event.event,
       "ES-EventId": event.uid
@@ -21,7 +21,7 @@ export const eventstoreProcessor = (event) => {
 }
 
 export const eventstoreQueue = (mutation) => {
-  if ( ["addBulb"].includes(mutation.type) ) {
+  if ( ["addBulb", "updateBulb"].includes(mutation.type) ) {
     const event = {
       uid: uuid(),
       event: mutation.type,

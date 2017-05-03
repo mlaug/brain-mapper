@@ -77,4 +77,17 @@ describe('bulbs store', () => {
       })
   })
 
+  it('should update a bulb if exists', (done) => {
+    store.dispatch('addBulb', {title: "samson"})
+      .then((uuid) => {
+        expect(store.state.bulbs[0].title).to.be.equal("samson")
+        store.commit("updateBulb", {uuid: uuid, title: "tiffy"})
+        expect(store.state.bulbs[0].title).to.be.equal("tiffy")
+        done()
+      })
+      .catch((e) => {
+        done(e)
+      })
+  })
+
 })
