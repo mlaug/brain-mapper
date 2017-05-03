@@ -94,7 +94,6 @@
       toggleShowInput(uuid) {
         this.showInput[uuid] = !this.showInput[uuid]
         this.showInput = Object.assign({}, this.showInput)
-        this.$refs["bulb-title-" - uuid].focus()
       },
 
       bulbTitleFocusOutHandler(uuid) {
