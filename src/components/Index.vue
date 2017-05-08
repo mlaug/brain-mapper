@@ -24,13 +24,19 @@
 
     <mapping></mapping>
 
+    <svg>
+      <defs>
+        <svg-pattern-of-some-sort id="my-pattern"/>
+      </defs>
+    </svg>
+
   </section>
 </template>
 
 <script>
 
   import Mapping from './Mapping'
-  import * as d3 from 'd3'
+  import axios from 'axios'
 
   const app = {
 
@@ -97,7 +103,7 @@
         var self = this
         this.$store.dispatch("addBulb", {
           summary: self.newBulb
-        }).then((uuid) => {
+        }).then((bulb) => {
 
           let canvas = document.createElement("canvas")
           canvas.width = 600
@@ -105,20 +111,23 @@
           let ctx = canvas.getContext("2d")
           ctx.drawImage(self.$refs.video, 0, 0, canvas.width, canvas.height)
 
-          let defs = d3.select("defs")
-          defs.append("pattern")
-            .attr("id", "bulbBackground-" + uuid)
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("patternContentUnits", "objectBoundingBox")
-            .attr("height", "100%")
-            .attr("width", "100%")
-            .append("image")
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("width", 1)
-            .attr("height", 1)
-            .attr("xlink:href", canvas.toDataURL("image/png"))
+          let dataUrl = canvas.toDataURL("image/png")
+          let blobBin = atob(dataUrl.split(',')[1]);
+          let array = [];
+          for (let i = 0; i < blobBin.length; i++) {
+            array.push(blobBin.charCodeAt(i));
+          }
+
+          let file = new Blob([new Uint8Array(array)], {type: 'image/png'});
+          let data = new FormData();
+          data.append('file', file, bulb.uuid + ".png");
+          axios.post('http://localhost:3000/', data)
+            .then(() => {
+              console.log("upload ok")
+              bulb.picture = "http://localhost:3000/" + bulb.uuid + ".png"
+              self.$store.commit("updateBulb", bulb)
+            })
+            .catch(() => console.log("upload fail"))
 
         })
 
@@ -252,13 +261,12 @@
     background: none repeat scroll 0 0 rgba(0, 0, 0, 0.003);
     box-shadow: inset 0 -2px 1px rgba(0, 0, 0, 0.03);
     color: #555555;
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 1em;
     line-height: 1.4em;
     padding: 5px 8px;
     transition: background-color 0.2s ease 0s;
   }
-
 
   .media {
     position: relative;

@@ -22,6 +22,7 @@
     "vue": "^2.2.2",
     "vue-focus": "^2.1.0",
     "vue-router": "^2.2.0",
+    "vue-truncate-filter": "^1.1.6",
     "vuex": "^2.2.1"
   },
   "devDependencies": {

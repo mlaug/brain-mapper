@@ -52,14 +52,14 @@ describe('event store', () => {
     const storageGetItemStub = sandbox.stub(window.localStorage, "getItem")
     storageGetItemStub.returns(JSON.stringify([event, event2]))
 
-    const axiosPutStub = sandbox.stub(axios, "put", () => {
+    const axiosPostStub = sandbox.stub(axios, "post", () => {
       return Promise.resolve()
     })
 
     eventstoreProcessor(event)
-    sinon.assert.calledOnce(axiosPutStub)
+    sinon.assert.calledOnce(axiosPostStub)
 
-    sinon.assert.calledWith(axiosPutStub, sinon.match.any, event.payload, {
+    sinon.assert.calledWith(axiosPostStub, sinon.match.any, event.payload, {
       headers: {
         "ES-EventType": event.event,
         "ES-EventId": event.uid
@@ -87,14 +87,14 @@ describe('event store', () => {
     const storageSetItemSpy = sandbox.spy(window.localStorage, "setItem")
     const storageGetItemStub = sandbox.spy(window.localStorage, "getItem")
 
-    const axiosPutStub = sandbox.stub(axios, "put", () => {
+    const axiosPostStub = sandbox.stub(axios, "post", () => {
       return Promise.reject()
     })
 
     eventstoreProcessor(event)
 
     setImmediate(() => {
-      sinon.assert.calledOnce(axiosPutStub)
+      sinon.assert.calledOnce(axiosPostStub)
       sinon.assert.notCalled(storageGetItemStub)
       sinon.assert.notCalled(storageSetItemSpy)
       done()
@@ -118,14 +118,14 @@ describe('event store', () => {
     const storageGetItemStub = sandbox.stub(window.localStorage, "getItem")
     storageGetItemStub.returns(JSON.stringify([event]))
 
-    const axiosPutStub = sandbox.stub(axios, "put", () => {
+    const axiosPostStub = sandbox.stub(axios, "post", () => {
       return Promise.resolve()
     })
 
     eventstoreProcessor(event)
-    sinon.assert.calledOnce(axiosPutStub)
+    sinon.assert.calledOnce(axiosPostStub)
 
-    sinon.assert.calledWith(axiosPutStub, sinon.match.any, event.payload, {
+    sinon.assert.calledWith(axiosPostStub, sinon.match.any, event.payload, {
       headers: {
         "ES-EventType": event.event,
         "ES-EventId": event.uid

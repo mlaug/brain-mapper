@@ -24,7 +24,7 @@ export const store = new Vuex.Store({
       return new Promise((resolve) => {
         payload.uuid = uuid()
         commit("addBulb", payload)
-        resolve(payload.uuid)
+        resolve(payload)
       })
     },
 
@@ -66,6 +66,7 @@ export const store = new Vuex.Store({
       state.bulbs.filter((bulb) => {
         return bulb.uuid === bulbToUpdate.uuid
       }).map((bulb) => {
+        // FIXME: this seems to be broken for update propagation
         bulb = Object.assign(bulb, bulbToUpdate)
       })
     },

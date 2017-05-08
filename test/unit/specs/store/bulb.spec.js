@@ -34,8 +34,9 @@ describe('bulbs store', () => {
 
   it('should store a bulb via action to retrieve id asynchronously', (done) => {
     store.dispatch('addBulb', {title: "samson"})
-      .then((uuid) => {
-        expect(uuid).to.be.not.null
+      .then((bulb) => {
+        expect(bulb.uuid).to.be.not.null
+        expect(bulb.title).to.be.equal("samson")
         done()
       })
       .catch((e) => {
@@ -79,9 +80,9 @@ describe('bulbs store', () => {
 
   it('should update a bulb if exists', (done) => {
     store.dispatch('addBulb', {title: "samson"})
-      .then((uuid) => {
+      .then((bulb) => {
         expect(store.state.bulbs[0].title).to.be.equal("samson")
-        store.commit("updateBulb", {uuid: uuid, title: "tiffy"})
+        store.commit("updateBulb", {uuid: bulb.uuid, title: "tiffy"})
         expect(store.state.bulbs[0].title).to.be.equal("tiffy")
         done()
       })
