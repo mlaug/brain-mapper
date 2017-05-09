@@ -121,10 +121,10 @@
           let file = new Blob([new Uint8Array(array)], {type: 'image/png'});
           let data = new FormData();
           data.append('file', file, bulb.uuid + ".png");
-          axios.post('http://localhost:3000/', data)
+          axios.post(process.env.media.image.url, data)
             .then(() => {
               console.log("upload ok")
-              bulb.picture = "http://localhost:3000/" + bulb.uuid + ".png"
+              bulb.picture = process.env.media.image.url + "/" + bulb.uuid + ".png"
               self.$store.commit("updateBulb", bulb)
             })
             .catch(() => console.log("upload fail"))

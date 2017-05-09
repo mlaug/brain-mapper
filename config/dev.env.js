@@ -10,6 +10,12 @@ module.exports = merge(prodEnv, {
 
   knowledge: {
     url: '"http://127.0.0.1:8080"'
+  },
+
+  media: {
+    image : {
+      url : '"http://127.0.0.1:3000"'
+    }
   }
 
 })
