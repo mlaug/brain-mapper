@@ -1,12 +1,6 @@
-// For authoring Nightwatch tests, see
-// http://nightwatchjs.org/guide#usage
-
 module.exports = {
 
   'check if elements are present': function (browser) {
-    // automatically uses dev Server port from /config.index.js
-    // default: http://localhost:8080
-    // see nightwatch.conf.js
     const devServer = browser.globals.devServerURL
     browser
       .url(devServer)
@@ -35,6 +29,22 @@ module.exports = {
       .setValue('input.new-bulb', ['this is my new bulb', browser.Keys.ENTER])
       .waitForElementVisible('.bulb', 1000)
       .end()
+  },
+
+  'should be able to preload elements from api': function (browser) {
+
+  },
+
+  'should be able to update title': function (browser) {
+
+  },
+
+  'should be able to select bulb to update summary': function (browser) {
+
+  },
+
+  'should be able to drag and drop to link two bulbs': function (browser) {
+    // https://www.robertkehoe.com/2014/10/nightwatchjs-drag-and-drop-example/
   }
 
 }

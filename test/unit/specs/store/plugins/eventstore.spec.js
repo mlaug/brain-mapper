@@ -32,6 +32,7 @@ describe('event store', () => {
 
   it('should be able to process an event and send it to the event store backend and remove from queue', (done) => {
 
+    // TODO: refactor this with a data provider with all kind of events
     const event = {
       event: "addBulb",
       payload: {
@@ -101,7 +102,6 @@ describe('event store', () => {
     })
 
   })
-
 
   it('should be able to process an update event', () => {
 

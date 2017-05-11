@@ -7,10 +7,10 @@
          ref="bulb"
          v-bind:uuid="bulb.uuid"
          v-on:dragstart="startBulbDrag"
-         v-on:dragover="dragBulbOver"
+         v-on:dragover.prevent="dragBulbOver"
          v-on:dragenter="dragBulbEnter"
          v-on:dragleave="dragBulbLeave"
-         v-on:drop="dropBulb"
+         v-on:drop.stop="dropBulb"
          v-on:dragend="endBulbDrag">
 
       <Bulb v-bind:bulb="bulb"/>
@@ -24,7 +24,8 @@
 <script>
 
   import Vue from 'vue'
-  import {focus} from 'vue-focus';
+  import {focus} from 'vue-focus'
+  import axios from 'axios'
   import Bulb from './mapping/Bulb.vue'
 
   const app = {
@@ -63,34 +64,17 @@
         let cols = document.querySelectorAll('.bulb');
         [].forEach.call(cols, function (col) {
           col.classList.remove('over')
-        });
+        })
       },
 
       dropBulb(e) {
-        if (e.stopPropagation) {
-          e.stopPropagation(); // stops the browser from redirecting.
-        }
-
         let uuidDroppedOn = e.target.getAttribute("uuid")
         let uuidDragged = e.dataTransfer.getData("plain/text")
-        console.log(uuidDroppedOn, uuidDragged)
 
-        let bulbIndexDroppedOn = this.bulbs.findIndex((bulb) => {
-            return bulb.uuid === uuidDroppedOn
+        this.$store.commit("linkBulb", {
+          from: uuidDragged,
+          to: uuidDroppedOn
         })
-
-        let bulbIndexDragged = this.bulbs.findIndex((bulb) => {
-          return bulb.uuid === uuidDragged
-        })
-
-        let tmpBulb = Object.assign({}, this.bulbs[bulbIndexDroppedOn])
-        console.log(tmpBulb)
-        console.log(bulbIndexDragged, bulbIndexDroppedOn)
-        this.bulbs[bulbIndexDroppedOn] = this.bulbs[bulbIndexDragged]
-        this.bulbs[bulbIndexDragged] = tmpBulb
-
-        // FIXME: it seems like the code above is not triggering a rerender?
-        this.bulbs.sort()
 
         return false
       },
@@ -104,10 +88,6 @@
       },
 
       dragBulbOver: (e) => {
-        if (e.preventDefault) {
-          e.preventDefault() // Necessary. Allows us to drop.
-        }
-
         e.dataTransfer.dropEffect = 'move'
       }
     },

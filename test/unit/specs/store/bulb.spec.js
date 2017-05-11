@@ -91,4 +91,29 @@ describe('bulbs store', () => {
       })
   })
 
+  it('should be able to add a link to a bulb', () => {
+    store.commit("addBulb", {title: "samson"})
+    store.commit("addBulb", {title: "tiffy"})
+    let linkFromUuid = store.state.bulbs[0].uuid
+    let linkToUuid = store.state.bulbs[1].uuid
+    expect(store.state.bulbs[0].links).to.be.equal(undefined)
+    store.commit("linkBulb", {
+      from: linkFromUuid,
+      to: linkToUuid
+    })
+    expect(store.state.bulbs[0].links.length).to.be.equal(1)
+  })
+
+  it('should NOT be able to add a link to a bulb which does not exist', () => {
+    store.commit("addBulb", {title: "samson"})
+    let linkFromUuid = store.state.bulbs[0].uuid
+    let linkToUuid = "not existing"
+    expect(store.state.bulbs[0].links).to.be.equal(undefined)
+    store.commit("linkBulb", {
+      from: linkFromUuid,
+      to: linkToUuid
+    })
+    expect(store.state.bulbs[0].links.length).to.be.equal(0)
+  })
+
 })

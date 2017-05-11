@@ -62,11 +62,26 @@ export const store = new Vuex.Store({
       state.bulbs.push(bulb)
     },
 
+    linkBulb (state, link) {
+      state.bulbs.filter((bulb) => {
+        return bulb.uuid === link.from
+      }).map((bulb) => {
+        // FIXME: I hate if clauses
+        // https://vuejs.org/v2/guide/reactivity.html
+        if ( !bulb.hasOwnProperty("links") ){
+          Vue.set(bulb, "links", [])
+        }
+        [state.bulbs.find((_bulb) => {
+          return _bulb.uuid === link.to
+        })].filter(toAdd => toAdd !== undefined)
+          .map((toAdd) => bulb.links.push(toAdd))
+      })
+    },
+
     updateBulb (state, bulbToUpdate) {
       state.bulbs.filter((bulb) => {
         return bulb.uuid === bulbToUpdate.uuid
       }).map((bulb) => {
-        // FIXME: this seems to be broken for update propagation
         bulb = Object.assign(bulb, bulbToUpdate)
       })
     },

@@ -18,10 +18,12 @@ export const eventstoreProcessor = (event) => {
   }).catch(response => {
 
   })
+
 }
 
 export const eventstoreQueue = (mutation) => {
-  if ( ["addBulb", "updateBulb"].includes(mutation.type) ) {
+
+  if ( ["addBulb", "updateBulb", "linkBulb"].includes(mutation.type) ) {
     const event = {
       uid: uuid(),
       event: mutation.type,
@@ -32,6 +34,7 @@ export const eventstoreQueue = (mutation) => {
     queue.push(event)
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(queue))
   }
+
 }
 
 export const Eventstore = store => {

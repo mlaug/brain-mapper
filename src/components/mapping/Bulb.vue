@@ -46,6 +46,13 @@
 
     <img v-if="showSummaryInput" v-bind:src="bulb.picture" width="100"/>
 
+    <div class="link blue"
+         v-bind:linkTo="link.uuid"
+         v-for="link in bulb.links"
+         v-on:mouseover="highlightLinks"
+         v-on:mouseout="dehghlightLinks"
+    ></div>
+
   </section>
 
 </template>
@@ -106,6 +113,18 @@
         this.$store.commit("updateBulb", this.bulb)
       },
 
+      highlightLinks(e) {
+        let uuidToHighlight = e.target.getAttribute("linkTo")
+        let sectionToHighlight = document.querySelector('section[uuid="' + uuidToHighlight + '"]')
+        sectionToHighlight.classList.add("link-highlight")
+      },
+
+      dehghlightLinks(e) {
+        let uuidToHighlight = e.target.getAttribute("linkTo")
+        let sectionToHighlight = document.querySelector('section[uuid="' + uuidToHighlight + '"]')
+        sectionToHighlight.classList.remove("link-highlight")
+      }
+
     },
 
   }
@@ -165,6 +184,30 @@
   .bulb textarea {
     background: white;
     margin: 0;
+  }
+
+  .link {
+    float: left;
+    width: 20px;
+    height: 20px;
+    margin: 5px;
+    border: 1px solid rgba(0, 0, 0, .2);
+  }
+
+  .blue {
+    background: #13b4ff;
+  }
+
+  .purple {
+    background: #ab3fdd;
+  }
+
+  .wine {
+    background: #ae163e;
+  }
+
+  .link-highlight {
+    background: #ae163e;
   }
 
 </style>
