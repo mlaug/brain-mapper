@@ -4,12 +4,28 @@ import uuid from '../../common/uuid'
 export const STORAGE_KEY = 'eventStoreQueue'
 
 export const eventstoreProcessor = (event) => {
-  axios.post(process.env.eventstore.url + '/streams/knowledge', event.payload, {
-    headers: {
-      "ES-EventType": event.event,
-      "ES-EventId": event.uid
-    }
-  }).then(response => {
+
+  let axiosPromise
+  if ( ["addBulb", "updateBulb", "linkBulb"].includes(event.event) ) {
+    axiosPromise = axios.post(process.env.eventstore.url + '/streams/knowledge', event.payload, {
+      headers: {
+        "ES-EventType": event.event,
+        "ES-EventId": event.uid
+      }
+    })
+  }
+
+
+  if ( ["addReference"].includes(event.event) ) {
+    axiosPromise = axios.post(process.env.eventstore.url + '/streams/reference', event.payload, {
+      headers: {
+        "ES-EventType": event.event,
+        "ES-EventId": event.uid
+      }
+    })
+  }
+
+  axiosPromise.then(response => {
     let queue = JSON.parse(window.localStorage.getItem(STORAGE_KEY))
     let queueWithoutProcessedElement = queue.filter((item) => {
       return item.uid != event.uid
@@ -23,7 +39,7 @@ export const eventstoreProcessor = (event) => {
 
 export const eventstoreQueue = (mutation) => {
 
-  if ( ["addBulb", "updateBulb", "linkBulb"].includes(mutation.type) ) {
+  if ( ["addBulb", "updateBulb", "linkBulb", "addReference"].includes(mutation.type) ) {
     const event = {
       uid: uuid(),
       event: mutation.type,

@@ -22,7 +22,9 @@ describe('bulbs store', () => {
   it('should be able to add elements and return newly created one', () => {
     store.commit("addBulb", {title: "samson"})
     expect(store.state.bulbs.length).to.be.equal(1)
-    expect(store.state.bulbs.shift().title).to.be.equal("samson")
+    let bulb = store.state.bulbs.shift()
+    expect(bulb.title).to.be.equal("samson")
+    expect(bulb.references.length).to.be.equal(0)
   })
 
   it('should have unique ids for inserted bulbs', () => {
@@ -96,7 +98,7 @@ describe('bulbs store', () => {
     store.commit("addBulb", {title: "tiffy"})
     let linkFromUuid = store.state.bulbs[0].uuid
     let linkToUuid = store.state.bulbs[1].uuid
-    expect(store.state.bulbs[0].links).to.be.equal(undefined)
+    expect(store.state.bulbs[0].links.length).to.be.equal(0)
     store.commit("linkBulb", {
       from: linkFromUuid,
       to: linkToUuid
@@ -108,12 +110,23 @@ describe('bulbs store', () => {
     store.commit("addBulb", {title: "samson"})
     let linkFromUuid = store.state.bulbs[0].uuid
     let linkToUuid = "not existing"
-    expect(store.state.bulbs[0].links).to.be.equal(undefined)
+    expect(store.state.bulbs[0].links.length).to.be.equal(0)
     store.commit("linkBulb", {
       from: linkFromUuid,
       to: linkToUuid
     })
     expect(store.state.bulbs[0].links.length).to.be.equal(0)
+  })
+
+  it('should be able to store reference', () => {
+    store.commit("addBulb", {title: "samson"})
+    expect(store.state.bulbs[0].references.length).to.be.equal(0)
+    store.commit("addReference", {
+      bulb: store.state.bulbs[0],
+      reference: "http://www.google.de"
+    })
+    expect(store.state.bulbs[0].references.length).to.be.equal(1)
+    expect(store.state.bulbs[0].references[0].raw).to.be.equal("http://www.google.de")
   })
 
 })

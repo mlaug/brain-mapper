@@ -1,57 +1,77 @@
 <template>
 
-  <section @click.stop="toggleShowSummaryInput" v-bind:class="{'bulb' : true, 'bulb-expand' : showSummaryInput}"
+  <section v-bind:class="{'bulb' : true, 'bulb-expand' : showDetails}"
            v-bind:uuid="bulb.uuid">
 
     <header>
       <transition name="fade">
-        <p v-if="showInput">
+        <p v-if="showInputTitle">
           <input
             v-bind:ref="'bulb-title-' + bulb.uuid"
             type="text"
             name="title"
             placeholder="Give it a title"
             v-model="bulb.title"
-            v-focus="showInput"
+            v-focus="showInputTitle"
             v-on:focusout="bulbTitleFocusOutHandler"
           />
         </p>
         <p
-          v-if="!showInput"
-          @click.stop="toggleShowInput">
+          v-if="!showInputTitle"
+          @click.stop="toggleInputTitle">
           {{bulb.title || "no title"}}
         </p>
       </transition>
     </header>
 
     <transition name="fade">
-      <p v-if="showSummaryInput">
-          <textarea
-            v-bind:ref="'bulb-summary-' + bulb.uuid"
-            type="text"
-            name="title"
-            placeholder="Give it a summary"
-            v-model="bulb.summary"
-            v-focus="showSummaryInput"
-            v-on:focusout="bulbSummaryFocusOutHandler">
+      <div v-if="showDetails">
+
+        <p @click.stop="toggleDetails">close</p>
+
+        <textarea
+          v-bind:ref="'bulb-summary-' + bulb.uuid"
+          type="text"
+          name="title"
+          placeholder="Give it a summary"
+          v-model="bulb.summary"
+          v-on:focusout="update">
             {{ bulb.summary }}
           </textarea>
-      </p>
-      <p
-        v-if="!showSummaryInput"
-        @click="toggleShowSummaryInput">
-        {{ bulb.summary | truncate }}
-      </p>
+
+        <div class="references">
+          <div class="reference"
+               v-for="reference in bulb.references">
+            {{ reference.raw }}
+          </div>
+          <div class="new-reference">
+            <input type="text" v-model="newReference" placeholder="new reference"/>
+            <span v-on:click.stop="addReference">save</span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-if="!showDetails"
+        @click.stop="toggleDetails">
+
+        <p @click="toggleDetails">details</p>
+
+        <p>{{ bulb.summary | truncate }}</p>
+
+        <div class="link blue"
+             v-bind:linkTo="link.uuid"
+             v-for="link in bulb.links"
+             v-on:mouseover="highlightLinks"
+             v-on:mouseout="dehighlightLinks"
+        ></div>
+
+      </div>
+
     </transition>
 
-    <img v-if="showSummaryInput" v-bind:src="bulb.picture" width="100"/>
+    <img v-if="showDetails" v-bind:src="bulb.picture" width="100"/>
 
-    <div class="link blue"
-         v-bind:linkTo="link.uuid"
-         v-for="link in bulb.links"
-         v-on:mouseover="highlightLinks"
-         v-on:mouseout="dehghlightLinks"
-    ></div>
 
   </section>
 
@@ -61,6 +81,7 @@
 
   import Vue from 'vue'
   import {focus} from 'vue-focus';
+  import uuid from '../../common/uuid'
 
   Vue.filter('truncate', function (text, stop, clamp) {
     stop = stop || 80
@@ -83,30 +104,37 @@
 
     data: function () {
       return {
-        showInput: false,
-        showSummaryInput: false,
-        selectedBulb: this.$store.state.selectedBulb,
+        showInputTitle: false,
+        showDetails: false,
+        newReference: ''
       }
     },
 
     methods: {
 
-      toggleShowInput() {
-        this.showInput = !this.showInput
+      toggleInputTitle() {
+        this.showInputTitle = !this.showInputTitle
       },
 
-      toggleShowSummaryInput() {
-        this.showSummaryInput = !this.showSummaryInput
+      toggleDetails() {
+        this.showDetails = !this.showDetails
       },
 
       bulbTitleFocusOutHandler() {
         this.update()
-        this.toggleShowInput()
+        this.toggleInputTitle()
       },
 
-      bulbSummaryFocusOutHandler() {
-        this.update()
-        this.toggleShowSummaryInput()
+      addReference() {
+        if (this.newReference.length > 0) {
+          this.$store.commit("addReference",
+            {
+              reference: this.newReference,
+              bulb: this.bulb
+            }
+          )
+          this.newReference = ''
+        }
       },
 
       update() {
@@ -119,7 +147,7 @@
         sectionToHighlight.classList.add("link-highlight")
       },
 
-      dehghlightLinks(e) {
+      dehighlightLinks(e) {
         let uuidToHighlight = e.target.getAttribute("linkTo")
         let sectionToHighlight = document.querySelector('section[uuid="' + uuidToHighlight + '"]')
         sectionToHighlight.classList.remove("link-highlight")

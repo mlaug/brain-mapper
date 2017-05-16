@@ -8,7 +8,7 @@ describe('Bulb.vue', () => {
 
   let storeStub
 
-  let bulbExample = {uuid: '123', title: 'title', summary: 'summary'}
+  let bulbExample = {uuid: '123', title: 'title', summary: 'summary', references: []}
 
   beforeEach(function () {
     sandbox = sinon.sandbox.create()
@@ -24,17 +24,17 @@ describe('Bulb.vue', () => {
     const Constructor = Vue.extend(Bulb)
     const vm = new Constructor({store, propsData: {bulb: bulbExample}}).$mount()
 
-    expect(vm.showInput).to.be.false
-    vm.toggleShowInput()
-    expect(vm.showInput).to.be.true
-    vm.toggleShowInput()
-    expect(vm.showInput).to.be.false
+    expect(vm.showInputTitle).to.be.false
+    vm.toggleInputTitle()
+    expect(vm.showInputTitle).to.be.true
+    vm.toggleInputTitle()
+    expect(vm.showInputTitle).to.be.false
 
-    expect(vm.showSummaryInput).to.be.false
-    vm.toggleShowSummaryInput()
-    expect(vm.showSummaryInput).to.be.true
-    vm.toggleShowSummaryInput()
-    expect(vm.showSummaryInput).to.be.false
+    expect(vm.showDetails).to.be.false
+    vm.toggleDetails()
+    expect(vm.showDetails).to.be.true
+    vm.toggleDetails()
+    expect(vm.showDetails).to.be.false
   })
 
   it('should commit updates if element is found', () => {
@@ -42,6 +42,19 @@ describe('Bulb.vue', () => {
     const vm = new Constructor({store, propsData: {bulb: bulbExample}}).$mount()
     vm.update()
     sinon.assert.calledOnce(storeStub)
+  })
+
+  it('should be able to add reference', () => {
+    const Constructor = Vue.extend(Bulb)
+    const vm = new Constructor({store, propsData: {bulb: bulbExample}}).$mount()
+    vm.newReference = "my new reference"
+    expect(vm.bulb.references.length).to.be.equal(0)
+    vm.addReference()
+    sinon.assert.calledWith(storeStub, "addReference", {
+      reference: "my new reference",
+      bulb: vm.bulb
+    })
+    expect(vm.newReference).to.be.equal('')
   })
 
 })

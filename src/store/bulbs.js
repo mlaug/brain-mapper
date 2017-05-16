@@ -57,8 +57,21 @@ export const store = new Vuex.Store({
       })
     },
 
+    addReference (state, {bulb, reference}) {
+      state.bulbs.filter((_bulb) => {
+        return _bulb.uuid === bulb.uuid
+      }).map((bulb) => {
+        bulb.references.push({
+          raw: reference,
+          uuid: uuid()
+        })
+      })
+    },
+
     addBulb (state, bulb) {
       bulb.uuid = bulb.uuid || uuid()
+      bulb.references = []
+      bulb.links = []
       state.bulbs.push(bulb)
     },
 
@@ -66,11 +79,6 @@ export const store = new Vuex.Store({
       state.bulbs.filter((bulb) => {
         return bulb.uuid === link.from
       }).map((bulb) => {
-        // FIXME: I hate if clauses
-        // https://vuejs.org/v2/guide/reactivity.html
-        if ( !bulb.hasOwnProperty("links") ){
-          Vue.set(bulb, "links", [])
-        }
         [state.bulbs.find((_bulb) => {
           return _bulb.uuid === link.to
         })].filter(toAdd => toAdd !== undefined)
