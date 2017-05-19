@@ -44,7 +44,7 @@
         <div class="references">
           <div class="reference"
                v-for="reference in bulb.references">
-            {{ reference.raw }}
+            {{ reference.reference }}
           </div>
           <div class="new-reference">
             <input type="text" v-model="newReference" placeholder="new reference"/>
@@ -129,7 +129,7 @@
 
       addReference() {
         if (this.newReference.length > 0) {
-          this.$store.commit("addReference",
+          this.$store.dispatch("addReference",
             {
               reference: this.newReference,
               bulb: this.bulb

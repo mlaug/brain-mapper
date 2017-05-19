@@ -28,6 +28,14 @@ export const store = new Vuex.Store({
       })
     },
 
+    addReference({commit}, payload){
+      return new Promise((resolve) => {
+        payload.uuid = uuid()
+        commit("addReference", payload)
+        resolve(payload)
+      })
+    },
+
     loadBulbs({commit}){
       return new Promise((resolve, reject) => {
         axios.get(process.env.knowledge.url + '/bulbs')
@@ -64,14 +72,13 @@ export const store = new Vuex.Store({
         if (bulb.references === null) {
           Vue.set(bulb, "references", [])
         }
-        bulb.references.push({
-          raw: reference,
-          uuid: uuid()
-        })
+        bulb.references.push(reference)
       })
     },
 
     addBulb (state, bulb) {
+      // FIXME: adding this at a later point is wrong and is not shoing up in the event log
+      // FIXME: how to make sure this function can only be called via dispather?
       bulb.uuid = bulb.uuid || uuid()
       bulb.references = []
       bulb.links = []
