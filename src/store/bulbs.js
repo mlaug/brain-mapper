@@ -61,6 +61,9 @@ export const store = new Vuex.Store({
       state.bulbs.filter((_bulb) => {
         return _bulb.uuid === bulb.uuid
       }).map((bulb) => {
+        if (bulb.references === null) {
+          Vue.set(bulb, "references", [])
+        }
         bulb.references.push({
           raw: reference,
           uuid: uuid()
@@ -82,7 +85,12 @@ export const store = new Vuex.Store({
         [state.bulbs.find((_bulb) => {
           return _bulb.uuid === link.to
         })].filter(toAdd => toAdd !== undefined)
-          .map((toAdd) => bulb.links.push(toAdd))
+          .map((toAdd) => {
+            if ( bulb.links === null ) {
+              Vue.set(bulb, "links", [])
+            }
+            bulb.links.push(toAdd)
+          })
       })
     },
 

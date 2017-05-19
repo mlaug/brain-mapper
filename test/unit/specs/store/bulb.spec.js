@@ -106,6 +106,20 @@ describe('bulbs store', () => {
     expect(store.state.bulbs[0].links.length).to.be.equal(1)
   })
 
+  it('should be able to create link list if not present', () => {
+    store.commit("addBulb", {title: "samson"})
+    store.commit("addBulb", {title: "tiffy"})
+    let linkFromUuid = store.state.bulbs[0].uuid
+    let linkToUuid = store.state.bulbs[1].uuid
+    // this can happen if called from the API
+    store.state.bulbs[0].links = null
+    store.commit("linkBulb", {
+      from: linkFromUuid,
+      to: linkToUuid
+    })
+    expect(store.state.bulbs[0].links.length).to.be.equal(1)
+  })
+
   it('should NOT be able to add a link to a bulb which does not exist', () => {
     store.commit("addBulb", {title: "samson"})
     let linkFromUuid = store.state.bulbs[0].uuid
@@ -121,6 +135,19 @@ describe('bulbs store', () => {
   it('should be able to store reference', () => {
     store.commit("addBulb", {title: "samson"})
     expect(store.state.bulbs[0].references.length).to.be.equal(0)
+    store.commit("addReference", {
+      bulb: store.state.bulbs[0],
+      reference: "http://www.google.de"
+    })
+    expect(store.state.bulbs[0].references.length).to.be.equal(1)
+    expect(store.state.bulbs[0].references[0].raw).to.be.equal("http://www.google.de")
+  })
+
+  it('should be able to create reference list if not present', () => {
+    store.commit("addBulb", {title: "samson"})
+    expect(store.state.bulbs[0].references.length).to.be.equal(0)
+    // this can happen if called from the API
+    store.state.bulbs[0].references = null
     store.commit("addReference", {
       bulb: store.state.bulbs[0],
       reference: "http://www.google.de"

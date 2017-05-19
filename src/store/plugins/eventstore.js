@@ -66,4 +66,4 @@ export const eventstoreIntervalTick = (callback) => {
 
 setInterval(() => {
   eventstoreIntervalTick(eventstoreProcessor)
-}, 1000000)
+}, 1000)
