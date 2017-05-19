@@ -145,6 +145,7 @@
 
       deleteBulb() {
         this.$store.commit("deleteBulb", this.bulb)
+        this.toggleDetails()
       },
 
       highlightLinks(e) {
