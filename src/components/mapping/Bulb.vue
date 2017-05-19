@@ -29,6 +29,8 @@
 
         <p @click.stop="toggleDetails">close</p>
 
+        <p @click.stop="deleteBulb">delete</p>
+
         <textarea
           v-bind:ref="'bulb-summary-' + bulb.uuid"
           type="text"
@@ -139,6 +141,10 @@
 
       update() {
         this.$store.commit("updateBulb", this.bulb)
+      },
+
+      deleteBulb() {
+        this.$store.commit("deleteBulb", this.bulb.uuid)
       },
 
       highlightLinks(e) {

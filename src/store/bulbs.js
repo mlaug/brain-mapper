@@ -86,7 +86,7 @@ export const store = new Vuex.Store({
           return _bulb.uuid === link.to
         })].filter(toAdd => toAdd !== undefined)
           .map((toAdd) => {
-            if ( bulb.links === null ) {
+            if (bulb.links === null) {
               Vue.set(bulb, "links", [])
             }
             bulb.links.push(toAdd)
@@ -100,6 +100,12 @@ export const store = new Vuex.Store({
       }).map((bulb) => {
         bulb = Object.assign(bulb, bulbToUpdate)
       })
+    },
+
+    deleteBulb(state, uuid) {
+      let index = state.bulbs.findIndex((bulb) => bulb.uuid === uuid)
+      if (index >= 0)
+        state.bulbs.splice(index, 1)
     },
 
     select (state, bulbUuid) {

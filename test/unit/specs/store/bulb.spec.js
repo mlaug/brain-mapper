@@ -156,4 +156,24 @@ describe('bulbs store', () => {
     expect(store.state.bulbs[0].references[0].raw).to.be.equal("http://www.google.de")
   })
 
+  it('should be able to remove a bulb', (done) => {
+    store.dispatch('addBulb', {title: "samson"})
+      .then((bulb) => {
+        expect(store.state.bulbs.length).to.be.equal(1)
+        store.commit("deleteBulb", bulb.uuid)
+        expect(store.state.bulbs.length).to.be.equal(0)
+        done()
+      })
+      .catch((e) => {
+        done(e)
+      })
+  })
+
+  it('should be able to remove a bulb', () => {
+    store.commit("addBulb", {title: "samson"})
+    expect(store.state.bulbs.length).to.be.equal(1)
+    store.commit("deleteBulb", "something not present")
+    expect(store.state.bulbs.length).to.be.equal(1)
+  })
+
 })

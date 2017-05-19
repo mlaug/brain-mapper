@@ -113,7 +113,6 @@ describe('event store', () => {
       uid: "C322E299-CB73-4B47-97C5-5054F920746E"
     }
 
-
     const storageSetItemSpy = sandbox.spy(window.localStorage, "setItem")
     const storageGetItemStub = sandbox.stub(window.localStorage, "getItem")
     storageGetItemStub.returns(JSON.stringify([event]))

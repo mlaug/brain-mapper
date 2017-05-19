@@ -6,7 +6,7 @@ export const STORAGE_KEY = 'eventStoreQueue'
 export const eventstoreProcessor = (event) => {
 
   let axiosPromise
-  if ( ["addBulb", "updateBulb", "linkBulb"].includes(event.event) ) {
+  if (["addBulb", "updateBulb", "linkBulb", "deleteBulb"].includes(event.event)) {
     axiosPromise = axios.post(process.env.eventstore.url + '/streams/knowledge', event.payload, {
       headers: {
         "ES-EventType": event.event,
@@ -15,8 +15,7 @@ export const eventstoreProcessor = (event) => {
     })
   }
 
-
-  if ( ["addReference"].includes(event.event) ) {
+  if (["addReference"].includes(event.event)) {
     axiosPromise = axios.post(process.env.eventstore.url + '/streams/reference', event.payload, {
       headers: {
         "ES-EventType": event.event,
@@ -39,7 +38,7 @@ export const eventstoreProcessor = (event) => {
 
 export const eventstoreQueue = (mutation) => {
 
-  if ( ["addBulb", "updateBulb", "linkBulb", "addReference"].includes(mutation.type) ) {
+  if (["addBulb", "updateBulb", "linkBulb", "addReference", "deleteBulb"].includes(mutation.type)) {
     const event = {
       uid: uuid(),
       event: mutation.type,
