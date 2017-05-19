@@ -160,7 +160,7 @@ describe('bulbs store', () => {
     store.dispatch('addBulb', {title: "samson"})
       .then((bulb) => {
         expect(store.state.bulbs.length).to.be.equal(1)
-        store.commit("deleteBulb", bulb.uuid)
+        store.commit("deleteBulb", bulb)
         expect(store.state.bulbs.length).to.be.equal(0)
         done()
       })

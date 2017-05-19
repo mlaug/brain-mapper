@@ -144,7 +144,7 @@
       },
 
       deleteBulb() {
-        this.$store.commit("deleteBulb", this.bulb.uuid)
+        this.$store.commit("deleteBulb", this.bulb)
       },
 
       highlightLinks(e) {

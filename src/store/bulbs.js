@@ -102,8 +102,8 @@ export const store = new Vuex.Store({
       })
     },
 
-    deleteBulb(state, uuid) {
-      let index = state.bulbs.findIndex((bulb) => bulb.uuid === uuid)
+    deleteBulb(state, bulbToDelete) {
+      let index = state.bulbs.findIndex((bulb) => bulb.uuid === bulbToDelete.uuid)
       if (index >= 0)
         state.bulbs.splice(index, 1)
     },
