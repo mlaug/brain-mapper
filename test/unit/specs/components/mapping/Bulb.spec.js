@@ -6,13 +6,16 @@ describe('Bulb.vue', () => {
 
   let sandbox
 
-  let storeStub
+  let storeStubCommit
+
+  let storeStubDispatch
 
   let bulbExample = {uuid: '123', title: 'title', summary: 'summary', references: []}
 
   beforeEach(function () {
     sandbox = sinon.sandbox.create()
-    storeStub = sandbox.stub(store, "commit")
+    storeStubCommit = sandbox.stub(store, "commit")
+    storeStubDispatch = sandbox.stub(store, "dispatch")
   });
 
   afterEach(function () {
@@ -41,7 +44,7 @@ describe('Bulb.vue', () => {
     const Constructor = Vue.extend(Bulb)
     const vm = new Constructor({store, propsData: {bulb: bulbExample}}).$mount()
     vm.update()
-    sinon.assert.calledOnce(storeStub)
+    sinon.assert.calledOnce(storeStubCommit)
   })
 
   it('should be able to add reference', () => {
@@ -50,9 +53,9 @@ describe('Bulb.vue', () => {
     vm.newReference = "my new reference"
     expect(vm.bulb.references.length).to.be.equal(0)
     vm.addReference()
-    sinon.assert.calledWith(storeStub, "addReference", {
-      reference: "my new reference",
-      bulb: vm.bulb
+    sinon.assert.calledWith(storeStubDispatch, "addReference", {
+      bulb: vm.bulb,
+      reference: "my new reference"
     })
     expect(vm.newReference).to.be.equal('')
   })

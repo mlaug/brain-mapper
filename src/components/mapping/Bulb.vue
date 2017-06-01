@@ -21,14 +21,15 @@
           @click.stop="toggleInputTitle">
           {{bulb.title || "no title"}}
         </p>
+
       </transition>
+
     </header>
 
     <transition name="fade">
       <div v-if="showDetails">
 
         <p @click.stop="toggleDetails">close</p>
-
         <p @click.stop="deleteBulb">delete</p>
 
         <textarea
@@ -37,6 +38,7 @@
           name="title"
           placeholder="Give it a summary"
           v-model="bulb.summary"
+          v-on:select="markText"
           v-on:focusout="update">
             {{ bulb.summary }}
           </textarea>
@@ -113,6 +115,10 @@
     },
 
     methods: {
+
+      markText(e) {
+          console.log(e)
+      },
 
       toggleInputTitle() {
         this.showInputTitle = !this.showInputTitle

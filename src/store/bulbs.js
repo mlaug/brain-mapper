@@ -28,9 +28,15 @@ export const store = new Vuex.Store({
       })
     },
 
-    addReference({commit}, payload){
+    addReference({commit}, {bulb, reference}){
       return new Promise((resolve) => {
-        payload.uuid = uuid()
+        let payload = {
+          bulb: bulb,
+          reference : {
+            uuid : uuid(),
+            reference: reference
+          }
+        }
         commit("addReference", payload)
         resolve(payload)
       })

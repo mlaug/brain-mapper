@@ -137,10 +137,13 @@ describe('bulbs store', () => {
     expect(store.state.bulbs[0].references.length).to.be.equal(0)
     store.commit("addReference", {
       bulb: store.state.bulbs[0],
-      reference: "http://www.google.de"
+      reference: {
+        uuid: "123-123-123",
+        reference: "http://www.google.de"
+      }
     })
     expect(store.state.bulbs[0].references.length).to.be.equal(1)
-    expect(store.state.bulbs[0].references[0].raw).to.be.equal("http://www.google.de")
+    expect(store.state.bulbs[0].references[0].reference).to.be.equal("http://www.google.de")
   })
 
   it('should be able to create reference list if not present', () => {
@@ -150,10 +153,13 @@ describe('bulbs store', () => {
     store.state.bulbs[0].references = null
     store.commit("addReference", {
       bulb: store.state.bulbs[0],
-      reference: "http://www.google.de"
+      reference: {
+        uuid: "123-123-123",
+        reference: "http://www.google.de"
+      }
     })
     expect(store.state.bulbs[0].references.length).to.be.equal(1)
-    expect(store.state.bulbs[0].references[0].raw).to.be.equal("http://www.google.de")
+    expect(store.state.bulbs[0].references[0].reference).to.be.equal("http://www.google.de")
   })
 
   it('should be able to remove a bulb', (done) => {
