@@ -5,30 +5,29 @@
 
       <h1>Bulbs</h1>
 
-      <input class="new-bulb"
-             autocomplete="off"
-             placeholder="What did you discover"
-             v-model="newBulb"
-             v-on:focus="showMedia = !showMedia"
-             v-on:focusout="showMedia = !showMedia"
-             @keyup="search"
-             @keyup.enter="addBulb">
-
-      <transition name="fade">
-        <section class="media" ref="media" v-if="showMedia">
-          <video ref="video" style="width:50px;height:50px"/>
-        </section>
-      </transition>
+      <div class="row">
+        <div class="col s10">
+          <input class="new-bulb"
+                 autocomplete="off"
+                 placeholder="What did you discover"
+                 v-model="newBulb"
+                 v-on:focus="showMedia = !showMedia"
+                 v-on:focusout="showMedia = !showMedia"
+                 @keyup="search"
+                 @keyup.enter="addBulb">
+        </div>
+        <div class="col s2">
+          <transition name="fade">
+            <section class="media" ref="media" v-if="showMedia">
+              <video ref="video" style="width:50px;height:50px"/>
+            </section>
+          </transition>
+        </div>
+      </div>
 
     </section>
 
     <mapping></mapping>
-
-    <svg>
-      <defs>
-        <svg-pattern-of-some-sort id="my-pattern"/>
-      </defs>
-    </svg>
 
   </section>
 </template>
@@ -142,173 +141,5 @@
 </script>
 
 <style>
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-  }
-
-  button {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: none;
-    font-size: 100%;
-    vertical-align: baseline;
-    font-family: inherit;
-    font-weight: inherit;
-    color: inherit;
-    -webkit-brainearance: none;
-    brainearance: none;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  body {
-    font: 14px 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    line-height: 1.4em;
-    background: #f5f5f5;
-    color: #4d4d4d;
-    min-width: 230px;
-    max-width: 850px;
-    margin: 0 auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-weight: 300;
-  }
-
-  :focus {
-    outline: 0;
-  }
-
-  .hidden {
-    display: none;
-  }
-
-  .brain {
-    background: #fff;
-    margin: 130px 0 40px 0;
-    position: relative;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2),
-    0 25px 50px 0 rgba(0, 0, 0, 0.1);
-  }
-
-  .brain input::-webkit-input-placeholder {
-    font-style: italic;
-    font-weight: 300;
-    color: #e6e6e6;
-  }
-
-  .brain input::-moz-placeholder {
-    font-style: italic;
-    font-weight: 300;
-    color: #e6e6e6;
-  }
-
-  .brain input::input-placeholder {
-    font-style: italic;
-    font-weight: 300;
-    color: #e6e6e6;
-  }
-
-  .brain h1 {
-    position: absolute;
-    top: -155px;
-    width: 100%;
-    font-size: 100px;
-    font-weight: 100;
-    text-align: center;
-    color: rgba(175, 47, 47, 0.15);
-    -webkit-text-rendering: optimizeLegibility;
-    -moz-text-rendering: optimizeLegibility;
-    text-rendering: optimizeLegibility;
-  }
-
-  .new-bulb {
-    position: relative;
-    margin: 0px;
-    width: 80%;
-    font-size: 24px;
-    font-family: inherit;
-    font-weight: inherit;
-    line-height: 1.4em;
-    border: 0;
-    color: inherit;
-    padding: 6px;
-    border: 1px solid #999;
-    box-shadow: inset 0 -1px 5px 0 rgba(0, 0, 0, 0.2);
-    box-sizing: border-box;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  .new-bulb {
-    padding: 16px 16px 16px 60px;
-    border: none;
-    background: rgba(0, 0, 0, 0.003);
-    box-shadow: inset 0 -2px 1px rgba(0, 0, 0, 0.03);
-  }
-
-  textarea {
-    margin-top: 10px;
-    margin-left: 50px;
-    width: 80%;
-    height: 100px;
-    -moz-border-bottom-colors: none;
-    -moz-border-left-colors: none;
-    -moz-border-right-colors: none;
-    -moz-border-top-colors: none;
-    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.003);
-    box-shadow: inset 0 -2px 1px rgba(0, 0, 0, 0.03);
-    color: #555555;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 1em;
-    line-height: 1.4em;
-    padding: 5px 8px;
-    transition: background-color 0.2s ease 0s;
-  }
-
-  .media {
-    position: relative;
-    float: right;
-    margin: 0px;
-  }
-
-  label[for='toggle-all'] {
-    display: none;
-  }
-
-  .footer {
-    color: #777;
-    padding: 10px 15px;
-    height: 20px;
-    text-align: center;
-    border-top: 1px solid #e6e6e6;
-  }
-
-  .footer:before {
-    content: '';
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    height: 50px;
-    overflow: hidden;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2),
-    0 8px 0 -3px #f6f6f6,
-    0 9px 1px -3px rgba(0, 0, 0, 0.2),
-    0 16px 0 -6px #f6f6f6,
-    0 17px 2px -6px rgba(0, 0, 0, 0.2);
-  }
-
-  @media (max-width: 430px) {
-    .footer {
-      height: 50px;
-    }
-
-    .filters {
-      bottom: 10px;
-    }
-  }
 
 </style>

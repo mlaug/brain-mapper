@@ -2,19 +2,20 @@
 
   <section class="mapping">
 
-    <div v-for="bulb in bulbs"
-         draggable="true"
-         ref="bulb"
-         v-bind:uuid="bulb.uuid"
-         v-on:dragstart="startBulbDrag"
-         v-on:dragover.prevent="dragBulbOver"
-         v-on:dragenter="dragBulbEnter"
-         v-on:dragleave="dragBulbLeave"
-         v-on:drop.stop="dropBulb"
-         v-on:dragend="endBulbDrag">
+    <div class="row">
+      <div v-for="bulb in bulbs"
+           draggable="true"
+           ref="bulb"
+           v-bind:uuid="bulb.uuid"
+           v-on:dragstart="startBulbDrag"
+           v-on:dragover.prevent="dragBulbOver"
+           v-on:dragenter="dragBulbEnter"
+           v-on:dragleave="dragBulbLeave"
+           v-on:drop.stop="dropBulb"
+           v-on:dragend="endBulbDrag">
 
-      <Bulb v-bind:bulb="bulb"/>
-
+        <Bulb v-bind:bulb="bulb"/>
+      </div>
     </div>
 
   </section>
@@ -98,10 +99,6 @@
 </script>
 
 <style>
-
-  .mapping {
-    height: 800px;
-  }
 
   [draggable] {
     -moz-user-select: none;

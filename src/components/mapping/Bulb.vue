@@ -3,79 +3,111 @@
   <section v-bind:class="{'bulb' : true, 'bulb-expand' : showDetails}"
            v-bind:uuid="bulb.uuid">
 
-    <header>
-      <transition name="fade">
-        <p v-if="showInputTitle">
-          <input
-            v-bind:ref="'bulb-title-' + bulb.uuid"
-            type="text"
-            name="title"
-            placeholder="Give it a title"
-            v-model="bulb.title"
-            v-focus="showInputTitle"
-            v-on:focusout="bulbTitleFocusOutHandler"
-          />
-        </p>
-        <p
-          v-if="!showInputTitle"
-          @click.stop="toggleInputTitle">
-          {{bulb.title || "no title"}}
-        </p>
+    <div class="col s12 m4">
+      <div class="card blue-grey darken-1">
+        <div class="card-content white-text">
 
-      </transition>
+          <transition name="fade">
+              <span class="card-title" v-if="showInputTitle">
+                <input
+                  v-bind:ref="'bulb-title-' + bulb.uuid"
+                  type="text"
+                  name="title"
+                  placeholder="Give it a title"
+                  v-model="bulb.title"
+                  v-focus="showInputTitle"
+                  v-on:focusout="bulbTitleFocusOutHandler"
+                />
+              </span>
+            <span
+              class="card-title"
+              v-if="!showInputTitle"
+              @click.stop="toggleInputTitle">
+                {{bulb.title || "no title"}}
+              </span>
+          </transition>
 
-    </header>
-
-    <transition name="fade">
-      <div v-if="showDetails">
-
-        <p @click.stop="toggleDetails">close</p>
-        <p @click.stop="deleteBulb">delete</p>
-
-        <textarea
-          v-bind:ref="'bulb-summary-' + bulb.uuid"
-          type="text"
-          name="title"
-          placeholder="Give it a summary"
-          v-model="bulb.summary"
-          v-on:select="markText"
-          v-on:focusout="update">
-            {{ bulb.summary }}
-          </textarea>
-
-        <div class="references">
-          <div class="reference"
-               v-for="reference in bulb.references">
-            {{ reference.reference }}
+          <div
+            @click.stop="toggleDetails">
+            <p>{{ bulb.summary | truncate }}</p>
           </div>
-          <div class="new-reference">
-            <input type="text" v-model="newReference" placeholder="new reference"/>
-            <span v-on:click.stop="addReference">save</span>
+
+        </div>
+        <div class="card-action">
+          <a><i @click.stop="deleteBulb" class="small material-icons left">delete</i></a>
+          <a><i @click.stop="toggleDetails" class="small material-icons right">mode_edit</i></a>
+          <i>&nbsp;</i>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal1" class="modal modal-fixed-footer">
+      <div class="modal-content">
+
+        <div class="col s12 m4">
+          <span class="card-title">
+            <input
+              v-bind:ref="'bulb-title-' + bulb.uuid"
+              type="text"
+              name="title"
+              placeholder="Give it a title"
+              v-model="bulb.title"
+            />
+          </span>
+        </div>
+
+        <div class="col s12">
+              <textarea
+                class="materialize-textarea"
+                v-bind:ref="'bulb-summary-' + bulb.uuid"
+                type="text"
+                name="title"
+                placeholder="Give it a summary"
+                v-model="bulb.summary"
+                v-on:select="markText">
+                {{ bulb.summary }}
+              </textarea>
+        </div>
+
+        <div class="col s12">
+          <div class="collection">
+            <div class="row" v-for="reference in bulb.references">
+              <div class="col s10">
+                <a class="reference collection-item">
+                  {{ reference.reference }}
+                </a>
+              </div>
+              <div class="col s2">
+                <image-loader class="materialboxed" v-bind:src="'/references/' + reference.uuid + '.png'" retries=3 />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col s10">
+                <i class="collection-item">
+                  <input type="url" v-model="newReference" placeholder="new reference" class="validate" />
+                </i>
+              </div>
+              <div class="col s2">
+                <a
+                  v-on:click.stop="addReference"
+                  class="btn-floating btn-small waves-effect waves-light red right"><i
+                  class="material-icons">add</i></a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      <div
-        v-if="!showDetails"
-        @click.stop="toggleDetails">
-
-        <p @click="toggleDetails">details</p>
-
-        <p>{{ bulb.summary | truncate }}</p>
-
-        <div class="link blue"
-             v-bind:linkTo="link.uuid"
-             v-for="link in bulb.links"
-             v-on:mouseover="highlightLinks"
-             v-on:mouseout="dehighlightLinks"
-        ></div>
-
+      <div class="modal-footer">
+        <div class="card-action">
+          <a><i @click.stop="deleteBulb" class="small material-icons left modal-close">delete</i></a>
+          <a><i @click.stop="takePicture" class="small material-icons center">videocam</i></a>
+          <a><i @click.stop="recordAudio" class="small material-icons center">settings_voice</i></a>
+          <a><i @click.stop="toggleDetails" class="small material-icons right modal-close">done</i></a>
+          <i>&nbsp;</i>
+        </div>
       </div>
-
-    </transition>
-
-    <img v-if="showDetails" v-bind:src="bulb.picture" width="100"/>
-
+    </div>
 
   </section>
 
@@ -86,6 +118,7 @@
   import Vue from 'vue'
   import {focus} from 'vue-focus';
   import uuid from '../../common/uuid'
+  import ImageLoader from '../ImageLoader.vue'
 
   Vue.filter('truncate', function (text, stop, clamp) {
     stop = stop || 80
@@ -98,6 +131,10 @@
     name: 'bulb',
 
     directives: {focus: focus},
+
+    components: {
+      ImageLoader
+    },
 
     props: {
       bulb: {
@@ -117,7 +154,7 @@
     methods: {
 
       markText(e) {
-          console.log(e)
+        console.log(e)
       },
 
       toggleInputTitle() {
@@ -125,7 +162,18 @@
       },
 
       toggleDetails() {
+        let self = this
         this.showDetails = !this.showDetails
+        // FIXME: jquery should be importet properly and not just expected
+        if ( typeof $ === "function" ) {
+          $('.modal').modal({
+            dismissible: true,
+            complete: () => {
+              self.update()
+            }
+          })
+          $('#modal1').modal('open')
+        }
       },
 
       bulbTitleFocusOutHandler() {
@@ -174,81 +222,5 @@
 </script>
 
 <style>
-
-  .bulb {
-    height: 150px;
-    width: 150px;
-    float: left;
-    border: 2px solid #666666;
-    background-color: #ccc;
-    margin: 8px;
-    -webkit-border-radius: 10px;
-    -ms-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 3px #000;
-    -ms-box-shadow: inset 0 0 3px #000;
-    box-shadow: inset 0 0 3px #000;
-    text-align: center;
-    cursor: move;
-  }
-
-  .bulb-expand {
-    position: absolute;
-    height: 100%;
-    width: 98%;
-  }
-
-  .bulb header {
-    color: #fff;
-    text-shadow: #000 0 1px;
-    box-shadow: 5px;
-    padding: 5px;
-    background: -moz-linear-gradient(left center, rgb(0, 0, 0), rgb(79, 79, 79), rgb(21, 21, 21));
-    background: -webkit-gradient(linear, left top, right top,
-    color-stop(0, rgb(0, 0, 0)),
-    color-stop(0.50, rgb(79, 79, 79)),
-    color-stop(1, rgb(21, 21, 21)));
-    background: -webkit-linear-gradient(left center, rgb(0, 0, 0), rgb(79, 79, 79), rgb(21, 21, 21));
-    background: -ms-linear-gradient(left center, rgb(0, 0, 0), rgb(79, 79, 79), rgb(21, 21, 21));
-    border-bottom: 1px solid #ddd;
-    -webkit-border-top-left-radius: 10px;
-    -moz-border-radius-topleft: 10px;
-    -ms-border-radius-topleft: 10px;
-    border-top-left-radius: 10px;
-    -webkit-border-top-right-radius: 10px;
-    -ms-border-top-right-radius: 10px;
-    -moz-border-radius-topright: 10px;
-    border-top-right-radius: 10px;
-  }
-
-  .bulb textarea {
-    background: white;
-    margin: 0;
-  }
-
-  .link {
-    float: left;
-    width: 20px;
-    height: 20px;
-    margin: 5px;
-    border: 1px solid rgba(0, 0, 0, .2);
-  }
-
-  .blue {
-    background: #13b4ff;
-  }
-
-  .purple {
-    background: #ab3fdd;
-  }
-
-  .wine {
-    background: #ae163e;
-  }
-
-  .link-highlight {
-    background: #ae163e;
-  }
 
 </style>
