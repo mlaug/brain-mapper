@@ -41,7 +41,7 @@
       </div>
     </div>
 
-    <div id="modal1" class="modal modal-fixed-footer">
+    <div v-bind:id="'modal-' + bulb.uuid" class="modal modal-fixed-footer">
       <div class="modal-content">
 
         <div class="col s12 m4">
@@ -172,7 +172,7 @@
               self.update()
             }
           })
-          $('#modal1').modal('open')
+          $('#modal-' + this.bulb.uuid).modal('open')
         }
       },
 

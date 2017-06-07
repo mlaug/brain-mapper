@@ -1,7 +1,7 @@
 <template>
   <section>
-    <img v-if="imageAvailable" @error="reloadImage" v-bind:src="src"/>
-    <div v-if="!imageAvailable" class="preloader-wrapper small active">
+    <img v-if="!error && imageAvailable" @error="reloadImage" v-bind:src="src" width="100"/>
+    <div v-if="!error && !imageAvailable" class="preloader-wrapper small active">
       <div class="spinner-layer spinner-green-only">
         <div class="circle-clipper left">
           <div class="circle"></div>
@@ -14,6 +14,7 @@
         </div>
       </div>
     </div>
+    <i v-if="error" class="material-icons" title="Image could not be loaded">error</i>
   </section>
 </template>
 
@@ -33,26 +34,34 @@
       src: {
         type: String,
         required: true
+      },
+      retryInterval: {
+        type: [String, Number],
+        default: 2000
       }
     },
 
     data: function () {
       return {
         retryCount: this.retries,
-        imageAvailable: true
+        imageAvailable: true,
+        error: false
       }
     },
 
     methods: {
-      reloadImage(e) {
+      reloadImage() {
+        this.retryCount = this.retryCount - 1
+        this.imageAvailable = false
+
         const self = this
-        self.imageAvailable = false
         axios.head(this.src).then(() => {
           self.imageAvailable = true
         }).catch(() => {
-          self.retryCount = self.retryCount - 1
-          if (self.retryCount > 0)
-            setTimeout(self.reloadImage, 2000)
+          if (self.retryCount >= 0)
+            setTimeout(self.reloadImage, self.retryInterval)
+          else
+            self.error = true
         })
       }
     }

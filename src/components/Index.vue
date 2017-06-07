@@ -1,5 +1,5 @@
 <template>
-  <section class="brain">
+  <section class="brain" v-if="authenticated">
 
     <section class="header">
 
@@ -45,9 +45,11 @@
       Mapping
     },
 
-    data: function () {
+    props: ['authenticated'],
 
+    data: function () {
       return {
+
         bulbs: this.$store.state.bulbs,
 
         showMedia: false,

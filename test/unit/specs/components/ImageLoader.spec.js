@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import ImageLoader from '@/components/ImageLoader.vue'
+import eventual from '../helper/eventual'
 import axios from 'axios'
 
 describe('ImageLoader.vue', () => {
@@ -14,39 +15,48 @@ describe('ImageLoader.vue', () => {
     sandbox.restore()
   })
 
-  it('should be succesfully load and stop calling', (done) => {
+  it('should stop trying once it succeeds', (done) => {
 
     let axiosStub = sandbox.stub(axios, "head", () => {
       return Promise.resolve()
     })
 
     const Constructor = Vue.extend(ImageLoader)
-    const vm = new Constructor({propsData: {src: "http://www.google.de/wrongpage", retries: 3}}).$mount()
-    expect(vm.retryCount).to.be.equal(3)
-    expect(vm.imageAvailable).to.be.true
+    const vm = new Constructor({
+      propsData: {
+        src: "http://www.google.de/wrongpage",
+        retries: 3,
+        retryInterval: 100
+      }
+    }).$mount()
     vm.reloadImage()
-    expect(vm.retryCount).to.be.equal(2)
-    expect(vm.imageAvailable).to.be.true
 
+    setImmediate(() => {
+      expect(vm.retryCount).to.be.equal(2)
+      expect(vm.error).to.be.false
+      expect(vm.imageAvailable).to.be.true
+      done()
+    })
   })
 
-  it('should retry load and stop calling after three times', (done) => {
+  it('should count down retries until zero and fail if the image keep being unavailable', (done) => {
 
     let axiosStub = sandbox.stub(axios, "head", () => {
-      return Promise.resolve()
+      return Promise.reject()
     })
 
     const Constructor = Vue.extend(ImageLoader)
-    const vm = new Constructor({propsData: {src: "http://i.imgur.com/LKlkxZH.jpg", retries: 3}}).$mount()
-    expect(vm.retryCount).to.be.equal(3)
-    expect(vm.imageAvailable).to.be.true
+    const vm = new Constructor({
+      propsData: {
+        src: "http://www.google.de/wrongpage",
+        retries: 3,
+        retryInterval: 100
+      }
+    }).$mount()
+
+    eventual.waitFor(vm, "retryCount").toBe(0).then(done).catch((err) => done(new Error(err)))
+    eventual.waitFor(vm, "error").toBe(true).then(done).catch((err) => done(new Error(err)))
     vm.reloadImage()
-    expect(vm.retryCount).to.be.equal(2)
-    expect(vm.imageAvailable).to.be.false
-    setImmediate(() => {
-      expect(vm.retryCount).to.be.equal(0)
-      expect(vm.imageAvailable).to.be.false
-    })
 
   })
 

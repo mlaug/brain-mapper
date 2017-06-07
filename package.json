@@ -14,11 +14,11 @@
     "deploy": "aws s3 cp dist s3://brain-mapper/ --recursive --acl public-read --profile brain"
   },
   "dependencies": {
+    "auth0-js": "^8.7.0",
     "axios": "^0.15.3",
     "babel-polyfill": "^6.23.0",
     "concat": "^3.0.0",
-    "d3": "^4.7.4",
-    "d3-scale": "^1.0.5",
+    "event-emitter": "^0.3.5",
     "lodash": "^4.17.4",
     "vue": "^2.2.2",
     "vue-focus": "^2.1.0",

@@ -44,7 +44,7 @@ export const store = new Vuex.Store({
 
     loadBulbs({commit}){
       return new Promise((resolve, reject) => {
-        axios.get(process.env.knowledge.url + '/bulbs')
+        axios.get(process.env.knowledge.url + '/' + localStorage.getItem('id_user') + '/bulbs')
           .then((response) => {
             commit("loadBulbs", response.data)
             resolve(response.data)
