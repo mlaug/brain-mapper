@@ -1,6 +1,10 @@
 module.exports = {
   NODE_ENV: '"production"',
 
+  auth: {
+    callback: '"http://brain-mapper.s3-website.eu-central-1.amazonaws.com/callback"'
+  },
+
   eventstore: {
     url: '"http://eventstore-25f46711.e084dea4.svc.dockerapp.io:2113"'
   },

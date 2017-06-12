@@ -26,13 +26,14 @@ describe('event store', () => {
     const storageSetItemSpy = sandbox.spy(window.localStorage, "setItem")
     const storageGetItemSpy = sandbox.spy(window.localStorage, "getItem")
     eventstoreQueue({type: "addBulb", payload: "samson"})
-    sinon.assert.calledOnce(storageGetItemSpy)
+    sinon.assert.calledThrice(storageGetItemSpy)
     sinon.assert.calledOnce(storageSetItemSpy)
   })
 
   it('should be able to process an event and send it to the event store backend and remove from queue', (done) => {
 
-    // TODO: refactor this with a data provider with all kind of events
+    // TODO: refactor this with a data provider
+    // with all kind of events
     const event = {
       event: "addBulb",
       payload: {

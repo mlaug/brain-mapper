@@ -7,7 +7,7 @@ export default class AuthService {
   authenticated = this.isAuthenticated()
   authNotifier = new EventEmitter()
 
-  constructor () {
+  constructor() {
     this.login = this.login.bind(this)
     this.setSession = this.setSession.bind(this)
     this.logout = this.logout.bind(this)
@@ -17,17 +17,17 @@ export default class AuthService {
   auth0 = new auth0.WebAuth({
     domain: 'mlaug.eu.auth0.com',
     clientID: '42212rKfM35ddrSCsTt4iAvHr0aGubvq',
-    redirectUri: 'http://localhost:8081/callback',
-    audience: 'https://mlaug.eu.auth0.com/userinfo',
+    redirectUri: process.env.auth.callback,
+    audience: 'bulb-knowledge',
     responseType: 'token id_token',
     scope: 'openid profile email'
   })
 
-  login () {
+  login() {
     this.auth0.authorize()
   }
 
-  handleAuthentication () {
+  handleAuthentication() {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         this.setSession(authResult)
@@ -39,7 +39,7 @@ export default class AuthService {
     })
   }
 
-  setSession (authResult) {
+  setSession(authResult) {
     // Set the time that the access token will expire at
     let expiresAt = JSON.stringify(
       authResult.expiresIn * 1000 + new Date().getTime()
@@ -51,19 +51,19 @@ export default class AuthService {
     this.authNotifier.emit('authChange', { authenticated: true })
   }
 
-  logout () {
+  logout() {
     // Clear access token and ID token from local storage
     localStorage.removeItem('access_token')
     localStorage.removeItem('id_token')
     localStorage.removeItem('expires_at')
     localStorage.removeItem('id_user')
     this.userProfile = null
-    this.authNotifier.emit('authChange', false)
+    this.authNotifier.emit('authChange', {authenticated: false})
     // navigate to the home route
     router.replace('/')
   }
 
-  isAuthenticated () {
+  isAuthenticated() {
     // Check whether the current time is past the
     // access token's expiry time
     let expiresAt = JSON.parse(localStorage.getItem('expires_at'))

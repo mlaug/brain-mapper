@@ -45,7 +45,7 @@
       Mapping
     },
 
-    props: ['authenticated'],
+    props: ['authenticated', 'auth'],
 
     data: function () {
       return {

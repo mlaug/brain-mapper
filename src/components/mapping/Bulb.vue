@@ -101,8 +101,6 @@
       <div class="modal-footer">
         <div class="card-action">
           <a><i @click.stop="deleteBulb" class="small material-icons left modal-close">delete</i></a>
-          <a><i @click.stop="takePicture" class="small material-icons center">videocam</i></a>
-          <a><i @click.stop="recordAudio" class="small material-icons center">settings_voice</i></a>
           <a><i @click.stop="toggleDetails" class="small material-icons right modal-close">done</i></a>
           <i>&nbsp;</i>
         </div>
@@ -144,6 +142,7 @@
     },
 
     data: function () {
+      $(".button-collapse").sideNav()
       return {
         showInputTitle: false,
         showDetails: false,

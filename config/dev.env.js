@@ -4,6 +4,10 @@ var prodEnv = require('./prod.env')
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
 
+  auth: {
+    callback: '"http://localhost:8081/callback"'
+  },
+
   eventstore: {
     url: '"http://127.0.0.1:2113"'
   },

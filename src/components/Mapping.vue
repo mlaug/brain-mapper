@@ -40,16 +40,10 @@
     directives: {focus: focus},
 
     data: function () {
+      this.$store.dispatch("loadBulbs")
       return {
         bulbs: this.$store.state.bulbs,
       }
-    },
-
-    mounted: function () {
-      const self = this
-      this.$store.dispatch("loadBulbs").then(() => {
-
-      })
     },
 
     methods: {

@@ -39,14 +39,22 @@ export const eventstoreProcessor = (event) => {
 export const eventstoreQueue = (mutation) => {
 
   if (["addBulb", "updateBulb", "linkBulb", "addReference", "deleteBulb"].includes(mutation.type)) {
+
     const event = {
       uid: uuid(),
       event: mutation.type,
-      payload: mutation.payload
+      payload: {
+        data: mutation.payload,
+        auth: {
+          token: localStorage.getItem('access_token'),
+          user: localStorage.getItem('id_user')
+        }
+      }
     }
 
     let queue = JSON.parse(window.localStorage.getItem(STORAGE_KEY)) || []
     queue.push(event)
+    console.log(JSON.stringify(queue))
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(queue))
   }
 
@@ -65,4 +73,4 @@ export const eventstoreIntervalTick = (callback) => {
 
 setInterval(() => {
   eventstoreIntervalTick(eventstoreProcessor)
-}, 1000000)
+}, 1000)
