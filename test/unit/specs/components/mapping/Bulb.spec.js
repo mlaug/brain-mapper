@@ -47,17 +47,4 @@ describe('Bulb.vue', () => {
     sinon.assert.calledOnce(storeStubCommit)
   })
 
-  it('should be able to add reference', () => {
-    const Constructor = Vue.extend(Bulb)
-    const vm = new Constructor({store, propsData: {bulb: bulbExample}}).$mount()
-    vm.newReference = "my new reference"
-    expect(vm.bulb.references.length).to.be.equal(0)
-    vm.addReference()
-    sinon.assert.calledWith(storeStubDispatch, "addReference", {
-      bulb: vm.bulb,
-      reference: "my new reference"
-    })
-    expect(vm.newReference).to.be.equal('')
-  })
-
 })

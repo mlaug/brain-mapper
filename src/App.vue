@@ -2,7 +2,7 @@
   <div>
     <nav>
       <div class="nav-wrapper">
-        <ul id="nav-mobile" class="right hide-on-med-and-down">
+        <ul id="nav-mobile" class="right">
           <li><a v-if="!authenticated" @click.stop="login()">Login</a></li>
           <li><a v-if="authenticated" @click.stop="logout()">Logout</a></li>
         </ul>

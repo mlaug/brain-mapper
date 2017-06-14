@@ -1,6 +1,8 @@
 import axios from 'axios'
 import uuid from '../../common/uuid'
 
+let available = true
+
 export const STORAGE_KEY = 'eventStoreQueue'
 
 export const eventstoreProcessor = (event) => {
@@ -31,7 +33,7 @@ export const eventstoreProcessor = (event) => {
     })
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(queueWithoutProcessedElement))
   }).catch(response => {
-
+    available = false
   })
 
 }
@@ -54,7 +56,6 @@ export const eventstoreQueue = (mutation) => {
 
     let queue = JSON.parse(window.localStorage.getItem(STORAGE_KEY)) || []
     queue.push(event)
-    console.log(JSON.stringify(queue))
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(queue))
   }
 
@@ -72,5 +73,6 @@ export const eventstoreIntervalTick = (callback) => {
 }
 
 setInterval(() => {
-  eventstoreIntervalTick(eventstoreProcessor)
+  if (available)
+    eventstoreIntervalTick(eventstoreProcessor)
 }, 1000)

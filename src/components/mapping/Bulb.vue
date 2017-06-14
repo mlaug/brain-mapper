@@ -57,50 +57,20 @@
         </div>
 
         <div class="col s12">
-              <textarea
-                class="materialize-textarea"
-                v-bind:ref="'bulb-summary-' + bulb.uuid"
-                type="text"
-                name="title"
-                placeholder="Give it a summary"
-                v-model="bulb.summary"
-                v-on:select="markText">
-                {{ bulb.summary }}
-              </textarea>
+          <bulb-editor ref="editor"
+                       v-bind:content="bulb.summary"
+                       v-bind:bulb="bulb"
+                       v-on:update="updateSummaryFromEditor"
+          />
         </div>
 
-        <div class="col s12">
-          <div class="collection">
-            <div class="row" v-for="reference in bulb.references">
-              <div class="col s10">
-                <a class="reference collection-item">
-                  {{ reference.reference }}
-                </a>
-              </div>
-              <div class="col s2">
-                <image-loader class="materialboxed" v-bind:src="'/references/' + reference.uuid + '.png'" retries=3 />
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col s10">
-                <i class="collection-item">
-                  <input type="url" v-model="newReference" placeholder="new reference" class="validate" />
-                </i>
-              </div>
-              <div class="col s2">
-                <a
-                  v-on:click.stop="addReference"
-                  class="btn-floating btn-small waves-effect waves-light red right"><i
-                  class="material-icons">add</i></a>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
       <div class="modal-footer">
         <div class="card-action">
           <a><i @click.stop="deleteBulb" class="small material-icons left modal-close">delete</i></a>
+          <a>
+            <speech-to-text v-on:text="appendVoiceText"></speech-to-text>
+          </a>
           <a><i @click.stop="toggleDetails" class="small material-icons right modal-close">done</i></a>
           <i>&nbsp;</i>
         </div>
@@ -117,6 +87,8 @@
   import {focus} from 'vue-focus';
   import uuid from '../../common/uuid'
   import ImageLoader from '../ImageLoader.vue'
+  import SpeechToText from '../SpeechToText.vue'
+  import BulbEditor from './Editor.vue'
 
   Vue.filter('truncate', function (text, stop, clamp) {
     stop = stop || 80
@@ -131,7 +103,7 @@
     directives: {focus: focus},
 
     components: {
-      ImageLoader
+      ImageLoader, SpeechToText, BulbEditor
     },
 
     props: {
@@ -142,18 +114,23 @@
     },
 
     data: function () {
-      $(".button-collapse").sideNav()
+
       return {
         showInputTitle: false,
         showDetails: false,
-        newReference: ''
+        highlightedText: null
       }
+
     },
 
     methods: {
 
-      markText(e) {
-        console.log(e)
+      updateSummaryFromEditor(content) {
+        this.bulb.summary = content
+      },
+
+      appendVoiceText(text) {
+        this.bulb.summary += "\n" + text
       },
 
       toggleInputTitle() {
@@ -164,7 +141,7 @@
         let self = this
         this.showDetails = !this.showDetails
         // FIXME: jquery should be importet properly and not just expected
-        if ( typeof $ === "function" ) {
+        if (typeof $ === "function") {
           $('.modal').modal({
             dismissible: true,
             complete: () => {
@@ -178,18 +155,6 @@
       bulbTitleFocusOutHandler() {
         this.update()
         this.toggleInputTitle()
-      },
-
-      addReference() {
-        if (this.newReference.length > 0) {
-          this.$store.dispatch("addReference",
-            {
-              reference: this.newReference,
-              bulb: this.bulb
-            }
-          )
-          this.newReference = ''
-        }
       },
 
       update() {
@@ -221,5 +186,10 @@
 </script>
 
 <style>
+
+  textarea.materialize-textarea {
+    min-height: 10rem;
+  }
+
 
 </style>
