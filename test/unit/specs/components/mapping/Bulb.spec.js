@@ -47,4 +47,12 @@ describe('Bulb.vue', () => {
     sinon.assert.calledOnce(storeStubCommit)
   })
 
+  it('should update the bulb if an update from the editor arrives', () => {
+    const Constructor = Vue.extend(Bulb)
+    const vm = new Constructor({store, propsData: {bulb: bulbExample}}).$mount()
+    vm.updateSummaryFromEditor("samson")
+    expect(vm.bulb.summary).to.be.equal("samson")
+    sinon.assert.calledOnce(storeStubCommit)
+  })
+
 })

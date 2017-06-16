@@ -175,7 +175,7 @@ describe('bulbs store', () => {
       })
   })
 
-  it('should be able to remove a bulb', () => {
+  it('should not be able to remove a non existing bulb', () => {
     store.commit("addBulb", {title: "samson"})
     expect(store.state.bulbs.length).to.be.equal(1)
     store.commit("deleteBulb", "something not present")

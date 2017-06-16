@@ -2,20 +2,20 @@ module.exports = {
   NODE_ENV: '"production"',
 
   auth: {
-    callback: '"http://brain-mapper.s3-website.eu-central-1.amazonaws.com/callback"'
+    callback: '"https://d2okb46agr3hfe.cloudfront.net/callback"'
   },
 
   eventstore: {
-    url: '"http://eventstore-25f46711.e084dea4.svc.dockerapp.io:2113"'
+    url: '"http://eventstore.bulbs.7dde450f.svc.dockerapp.io:2113"'
   },
 
   knowledge: {
-    url: '"http://brain-0a93d78e.34c51afa.svc.dockerapp.io"'
+    url: '"http://knowledge.bulbs.4fa60b1c.svc.dockerapp.io:9000"'
   },
 
   media: {
     image: {
-      url: '"http://brain-media-upload-45ebe617.f345241d.svc.dockerapp.io"'
+      url: '"http://image-upload.bulbs.0fb11f39.svc.dockerapp.io:3000"'
     }
   }
 

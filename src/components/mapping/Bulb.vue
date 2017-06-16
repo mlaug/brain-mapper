@@ -3,7 +3,7 @@
   <section v-bind:class="{'bulb' : true, 'bulb-expand' : showDetails}"
            v-bind:uuid="bulb.uuid">
 
-    <div class="col s12 m4">
+    <div class="col s12 m3">
       <div class="card blue-grey darken-1">
         <div class="card-content white-text">
 
@@ -27,9 +27,8 @@
               </span>
           </transition>
 
-          <div
-            @click.stop="toggleDetails">
-            <p>{{ bulb.summary | truncate }}</p>
+          <div @click.stop="toggleDetails">
+            <image-loader retries="10" retryInterval="1000" v-bind:src='"https://s3.eu-central-1.amazonaws.com/brain-mapper/bulb/" + bulb.uuid + ".png"' />
           </div>
 
         </div>
@@ -96,6 +95,12 @@
     return text.slice(0, stop) + (stop < text.length ? clamp || '...' : '')
   })
 
+  Vue.filter('stripHTML', function strip(html) {
+    let tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
+  })
+
   const app = {
 
     name: 'bulb',
@@ -114,19 +119,18 @@
     },
 
     data: function () {
-
       return {
         showInputTitle: false,
         showDetails: false,
         highlightedText: null
       }
-
     },
 
     methods: {
 
       updateSummaryFromEditor(content) {
         this.bulb.summary = content
+        this.update()
       },
 
       appendVoiceText(text) {
@@ -165,18 +169,6 @@
         this.$store.commit("deleteBulb", this.bulb)
         this.toggleDetails()
       },
-
-      highlightLinks(e) {
-        let uuidToHighlight = e.target.getAttribute("linkTo")
-        let sectionToHighlight = document.querySelector('section[uuid="' + uuidToHighlight + '"]')
-        sectionToHighlight.classList.add("link-highlight")
-      },
-
-      dehighlightLinks(e) {
-        let uuidToHighlight = e.target.getAttribute("linkTo")
-        let sectionToHighlight = document.querySelector('section[uuid="' + uuidToHighlight + '"]')
-        sectionToHighlight.classList.remove("link-highlight")
-      }
 
     },
 

@@ -21,7 +21,7 @@ describe('Media.vue', () => {
     const Constructor = Vue.extend(Editor)
     const vm = new Constructor({propsData: {bulb: bulbExample, content: "summary"}}).$mount()
 
-    let expectedContent = "[reference:123]s[/reference]ummary"
+    let expectedContent = "<a reference=\"123\">s</a>ummary"
 
     vm.$on('update', (content) => {
       expect(content).to.be.equal(expectedContent)
